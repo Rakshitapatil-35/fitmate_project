@@ -213,7 +213,7 @@ export async function renderHistoryProfilesPage() {
                       </div>
 
                       ${
-                        false && historyEntries.length > 0
+                        true && historyEntries.length > 0
                           ? `
                         <details style="margin-bottom: 0.9rem; background: var(--color-surface-subtle); padding: 0.5rem 0.7rem; border-radius: var(--radius-sm);">
                           <summary style="font-size: 0.74rem; font-weight: 800; color: var(--color-secondary); cursor: pointer;">
@@ -228,6 +228,29 @@ export async function renderHistoryProfilesPage() {
                       }
                     </div>
 
+                    
+                    <!-- Action Buttons: Use & Re-run, Edit, Reset, Delete -->
+                    <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.45rem; border-top: 1px solid var(--color-border-subtle); padding-top: 0.75rem;">
+                      <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+                        <button type="button" class="btn-select-profile fm-btn ${isSelected ? 'fm-btn-primary' : 'fm-btn-secondary'} fm-btn-sm" data-id="${prof.id}" style="font-size: 0.75rem; padding: 0.35rem 0.75rem;">
+                          <span>${isSelected ? 'Use & Run' : 'Select'}</span>
+                        </button>
+
+                        <button type="button" class="btn-edit-profile fm-btn fm-btn-secondary fm-btn-sm" data-id="${prof.id}" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; color: var(--color-secondary); border-color: var(--color-secondary);">
+                          <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>
+                          <span>Edit</span>
+                        </button>
+
+                        <button type="button" class="btn-reset-profile fm-btn fm-btn-ghost fm-btn-sm" data-id="${prof.id}" style="font-size: 0.74rem; padding: 0.35rem 0.55rem; color: var(--color-marigold);" title="Reset profile measurements to baseline">
+                          <span class="material-symbols-outlined" style="font-size: 16px;">restart_alt</span>
+                          <span>Reset</span>
+                        </button>
+                      </div>
+
+                      <button type="button" class="btn-quick-dismiss fm-btn fm-btn-ghost fm-btn-sm" data-id="${prof.id}" style="color: var(--color-error); font-size: 0.75rem; padding: 0.3rem 0.5rem;" title="Delete profile">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                      </button>
+                    </div>
                     
                   </div>
                 `;
