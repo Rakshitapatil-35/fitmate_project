@@ -1,0 +1,84 @@
+{
+  "model_name": "Model 3: Garment Measurement Regressor",
+  "target_dimensions": [
+    "bust_cm",
+    "waist_cm",
+    "length_cm",
+    "inseam_cm"
+  ],
+  "output_flag": "estimated",
+  "data_sufficiency_assessment": {
+    "status": "insufficient_sample_size",
+    "real_measured_rows": 653,
+    "note": "Model was trained strictly on 653 genuine vintage garment measurements without label fabrication. Production use requires expanding training data to 10,000+ brand size-chart specs.",
+    "recommended_data_to_add": [
+      "Brand-specific grading tech packs (spec sheets per size)",
+      "E-commerce size chart tables with flat garment chest, waist, and length dimensions in cm",
+      "Fast-fashion size guides (Zara, H&M, Uniqlo, Levi's spec sheets)"
+    ]
+  },
+  "per_dimension_metrics": {
+    "bust_cm": {
+      "best_algorithm": "XGBoost",
+      "train_samples": 276,
+      "test_samples": 69,
+      "baseline_mae_cm": 12.57,
+      "baseline_rmse_cm": 15.73,
+      "model_mae_cm": 10.04,
+      "model_rmse_cm": 13.1,
+      "mae_improvement_cm": 2.54,
+      "prediction_interval_80pct_cm": 12.8
+    },
+    "waist_cm": {
+      "best_algorithm": "RandomForest",
+      "train_samples": 289,
+      "test_samples": 73,
+      "baseline_mae_cm": 6.73,
+      "baseline_rmse_cm": 8.37,
+      "model_mae_cm": 3.16,
+      "model_rmse_cm": 4.28,
+      "mae_improvement_cm": 3.56,
+      "prediction_interval_80pct_cm": 5.4
+    },
+    "length_cm": {
+      "best_algorithm": "XGBoost",
+      "train_samples": 298,
+      "test_samples": 75,
+      "baseline_mae_cm": 15.46,
+      "baseline_rmse_cm": 19.82,
+      "model_mae_cm": 10.16,
+      "model_rmse_cm": 13.21,
+      "mae_improvement_cm": 5.3,
+      "prediction_interval_80pct_cm": 16.8
+    },
+    "inseam_cm": {
+      "best_algorithm": "XGBoost",
+      "train_samples": 200,
+      "test_samples": 51,
+      "baseline_mae_cm": 4.82,
+      "baseline_rmse_cm": 8.67,
+      "model_mae_cm": 4.14,
+      "model_rmse_cm": 8.18,
+      "mae_improvement_cm": 0.68,
+      "prediction_interval_80pct_cm": 5.9
+    }
+  },
+  "features": [
+    "brand",
+    "category",
+    "size_label"
+  ],
+  "training_dataset": {
+    "name": "data/processed/model_3_garment_data.parquet",
+    "sources": [
+      "Kitanesque Vintage Garments, Jeans, Knitwear, Rise datasets"
+    ],
+    "total_rows": 653
+  },
+  "training_date": "2026-11-15T10:59:13.391199",
+  "library_versions": {
+    "sklearn": "1.9.1",
+    "xgboost": "3.4.1",
+    "joblib": "1.6.0"
+  }
+}

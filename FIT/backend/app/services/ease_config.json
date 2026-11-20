@@ -1,0 +1,150 @@
+{
+  "mens_tops": {
+    "weights": {
+      "chest_bust": 0.45,
+      "shoulder": 0.25,
+      "sleeve": 0.15,
+      "torso": 0.15
+    },
+    "ease_allowances_cm": {
+      "slim": {
+        "chest_bust": {"min": 2.0, "ideal": 5.0, "max": 8.0, "tolerance": 4.0},
+        "shoulder": {"min": -0.5, "ideal": 1.0, "max": 2.5, "tolerance": 2.0},
+        "sleeve": {"min": -1.0, "ideal": 0.5, "max": 2.0, "tolerance": 2.5},
+        "torso": {"min": 0.0, "ideal": 2.0, "max": 4.5, "tolerance": 3.0}
+      },
+      "regular": {
+        "chest_bust": {"min": 5.0, "ideal": 9.0, "max": 13.0, "tolerance": 4.5},
+        "shoulder": {"min": 0.0, "ideal": 2.0, "max": 4.0, "tolerance": 2.5},
+        "sleeve": {"min": -0.5, "ideal": 1.0, "max": 3.0, "tolerance": 2.5},
+        "torso": {"min": 1.0, "ideal": 3.5, "max": 6.5, "tolerance": 3.5}
+      },
+      "relaxed": {
+        "chest_bust": {"min": 9.0, "ideal": 14.0, "max": 20.0, "tolerance": 5.5},
+        "shoulder": {"min": 1.5, "ideal": 3.5, "max": 6.0, "tolerance": 3.0},
+        "sleeve": {"min": 0.0, "ideal": 2.0, "max": 4.5, "tolerance": 3.0},
+        "torso": {"min": 2.5, "ideal": 5.0, "max": 8.5, "tolerance": 4.0}
+      }
+    }
+  },
+  "womens_tops": {
+    "weights": {
+      "chest_bust": 0.45,
+      "underbust": 0.15,
+      "shoulder": 0.25,
+      "sleeve": 0.15
+    },
+    "ease_allowances_cm": {
+      "slim": {
+        "chest_bust": {"min": 1.0, "ideal": 4.0, "max": 7.0, "tolerance": 3.5},
+        "underbust": {"min": 0.5, "ideal": 2.5, "max": 5.0, "tolerance": 3.0},
+        "shoulder": {"min": -0.5, "ideal": 0.8, "max": 2.0, "tolerance": 2.0},
+        "sleeve": {"min": -1.0, "ideal": 0.5, "max": 2.0, "tolerance": 2.5}
+      },
+      "regular": {
+        "chest_bust": {"min": 4.0, "ideal": 7.5, "max": 11.5, "tolerance": 4.0},
+        "underbust": {"min": 2.0, "ideal": 4.5, "max": 7.5, "tolerance": 3.5},
+        "shoulder": {"min": 0.0, "ideal": 1.5, "max": 3.5, "tolerance": 2.5},
+        "sleeve": {"min": -0.5, "ideal": 1.0, "max": 2.5, "tolerance": 2.5}
+      },
+      "relaxed": {
+        "chest_bust": {"min": 8.0, "ideal": 12.5, "max": 18.0, "tolerance": 5.0},
+        "underbust": {"min": 4.5, "ideal": 8.0, "max": 12.5, "tolerance": 4.5},
+        "shoulder": {"min": 1.0, "ideal": 3.0, "max": 5.5, "tolerance": 3.0},
+        "sleeve": {"min": 0.5, "ideal": 2.0, "max": 4.0, "tolerance": 3.0}
+      }
+    }
+  },
+  "mens_bottoms": {
+    "weights": {
+      "waist": 0.40,
+      "hips": 0.22,
+      "inseam": 0.16,
+      "thigh": 0.12,
+      "rise": 0.10
+    },
+    "ease_allowances_cm": {
+      "slim": {
+        "waist": {"min": 0.5, "ideal": 2.0, "max": 4.0, "tolerance": 2.5},
+        "hips": {"min": 2.0, "ideal": 4.5, "max": 7.5, "tolerance": 3.5},
+        "inseam": {"min": -1.5, "ideal": 0.0, "max": 2.0, "tolerance": 2.5},
+        "thigh": {"min": 1.5, "ideal": 3.5, "max": 6.0, "tolerance": 3.0},
+        "rise": {"min": -1.0, "ideal": 0.5, "max": 2.0, "tolerance": 2.0}
+      },
+      "regular": {
+        "waist": {"min": 1.5, "ideal": 3.5, "max": 6.0, "tolerance": 3.0},
+        "hips": {"min": 4.0, "ideal": 7.5, "max": 11.0, "tolerance": 4.0},
+        "inseam": {"min": -1.0, "ideal": 0.5, "max": 2.5, "tolerance": 2.5},
+        "thigh": {"min": 3.0, "ideal": 6.0, "max": 9.0, "tolerance": 3.5},
+        "rise": {"min": 0.0, "ideal": 1.0, "max": 3.0, "tolerance": 2.5}
+      },
+      "relaxed": {
+        "waist": {"min": 3.0, "ideal": 5.5, "max": 8.5, "tolerance": 3.5},
+        "hips": {"min": 7.0, "ideal": 11.0, "max": 15.5, "tolerance": 4.5},
+        "inseam": {"min": -0.5, "ideal": 1.0, "max": 3.5, "tolerance": 3.0},
+        "thigh": {"min": 5.5, "ideal": 9.0, "max": 13.0, "tolerance": 4.0},
+        "rise": {"min": 0.5, "ideal": 2.0, "max": 4.5, "tolerance": 3.0}
+      }
+    }
+  },
+  "womens_bottoms": {
+    "weights": {
+      "waist": 0.35,
+      "hips": 0.32,
+      "inseam": 0.13,
+      "thigh": 0.10,
+      "rise": 0.10
+    },
+    "ease_allowances_cm": {
+      "slim": {
+        "waist": {"min": 0.0, "ideal": 1.5, "max": 3.5, "tolerance": 2.5},
+        "hips": {"min": 1.0, "ideal": 3.5, "max": 6.0, "tolerance": 3.0},
+        "inseam": {"min": -1.5, "ideal": 0.0, "max": 1.5, "tolerance": 2.5},
+        "thigh": {"min": 1.0, "ideal": 2.5, "max": 4.5, "tolerance": 2.5},
+        "rise": {"min": -1.0, "ideal": 0.5, "max": 2.0, "tolerance": 2.0}
+      },
+      "regular": {
+        "waist": {"min": 1.5, "ideal": 3.0, "max": 5.5, "tolerance": 3.0},
+        "hips": {"min": 3.0, "ideal": 6.0, "max": 9.5, "tolerance": 3.5},
+        "inseam": {"min": -1.0, "ideal": 0.5, "max": 2.0, "tolerance": 2.5},
+        "thigh": {"min": 2.5, "ideal": 5.0, "max": 8.0, "tolerance": 3.0},
+        "rise": {"min": 0.0, "ideal": 1.0, "max": 2.5, "tolerance": 2.0}
+      },
+      "relaxed": {
+        "waist": {"min": 3.0, "ideal": 5.0, "max": 8.0, "tolerance": 3.5},
+        "hips": {"min": 6.0, "ideal": 10.0, "max": 14.5, "tolerance": 4.5},
+        "inseam": {"min": -0.5, "ideal": 1.0, "max": 3.0, "tolerance": 3.0},
+        "thigh": {"min": 4.5, "ideal": 7.5, "max": 11.5, "tolerance": 3.5},
+        "rise": {"min": 0.5, "ideal": 2.0, "max": 4.0, "tolerance": 2.5}
+      }
+    }
+  },
+  "womens_dresses": {
+    "weights": {
+      "chest_bust": 0.36,
+      "waist": 0.34,
+      "hips": 0.20,
+      "shoulder": 0.10
+    },
+    "ease_allowances_cm": {
+      "slim": {
+        "chest_bust": {"min": 0.5, "ideal": 3.0, "max": 6.0, "tolerance": 3.5},
+        "waist": {"min": 0.5, "ideal": 2.5, "max": 5.0, "tolerance": 3.0},
+        "hips": {"min": 1.0, "ideal": 3.5, "max": 6.5, "tolerance": 3.5},
+        "shoulder": {"min": -0.5, "ideal": 0.8, "max": 2.0, "tolerance": 2.0}
+      },
+      "regular": {
+        "chest_bust": {"min": 3.0, "ideal": 6.5, "max": 10.5, "tolerance": 4.0},
+        "waist": {"min": 2.0, "ideal": 5.0, "max": 8.5, "tolerance": 3.5},
+        "hips": {"min": 3.5, "ideal": 7.0, "max": 11.0, "tolerance": 4.0},
+        "shoulder": {"min": 0.0, "ideal": 1.5, "max": 3.5, "tolerance": 2.5}
+      },
+      "relaxed": {
+        "chest_bust": {"min": 7.0, "ideal": 11.5, "max": 17.0, "tolerance": 5.0},
+        "waist": {"min": 6.0, "ideal": 10.5, "max": 16.0, "tolerance": 4.5},
+        "hips": {"min": 7.0, "ideal": 12.0, "max": 18.0, "tolerance": 5.0},
+        "shoulder": {"min": 1.0, "ideal": 3.0, "max": 5.5, "tolerance": 3.0}
+      }
+    }
+  }
+}

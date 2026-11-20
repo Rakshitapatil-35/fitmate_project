@@ -1,0 +1,284 @@
+{
+  "info": {
+    "_postman_id": "a7f902c4-5d12-43d1-90aa-112233445566",
+    "name": "Size Recommendation Backend API (v1)",
+    "description": "Complete Postman collection for testing the FastAPI Size Recommendation REST Backend.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8000/api/v1"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Auth & Users",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"shopper@sizerec.example.com\",\n  \"full_name\": \"Sam Shopper\",\n  \"password\": \"SecurePass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alex@sizerec.example.com\",\n  \"password\": \"UserPass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sizerec.example.com\",\n  \"password\": \"AdminPass123\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Current User Profile",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/users/me"
+          }
+        },
+        {
+          "name": "Logout User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": "{{baseUrl}}/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Body Measurements",
+      "item": [
+        {
+          "name": "Convert Inches to CM",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/measurements/convert",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 38.5,\n  \"from_unit\": \"in\",\n  \"to_unit\": \"cm\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Create Measurement Profile (in Inches)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": "{{baseUrl}}/measurements",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"profile_name\": \"My Everyday Profile\",\n  \"gender\": \"male\",\n  \"fit_preference\": \"regular\",\n  \"unit\": \"in\",\n  \"weight_unit\": \"lbs\",\n  \"chest_bust\": 38.5,\n  \"shoulder\": 17.7,\n  \"sleeve\": 25.2,\n  \"torso\": 26.8,\n  \"waist\": 33.0,\n  \"hips\": 39.0,\n  \"inseam\": 31.5,\n  \"height\": 70.5,\n  \"weight\": 168.0,\n  \"is_default\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "List My Measurement Profiles",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/measurements"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Brands & Products",
+      "item": [
+        {
+          "name": "List Brands",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/brands"
+          }
+        },
+        {
+          "name": "List Clothing Categories",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/brands/categories"
+          }
+        },
+        {
+          "name": "List Products",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/products"
+          }
+        },
+        {
+          "name": "Get Product Size Chart",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/products/1/size-chart"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Size Recommendations & Feedback",
+      "item": [
+        {
+          "name": "Generate Size Recommendation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": "{{baseUrl}}/recommendations",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"product_id\": 1,\n  \"top_n\": 3,\n  \"use_ml\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Submit Fit Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": "{{baseUrl}}/feedback",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recommendation_id\": 1,\n  \"actual_size_worn\": \"M\",\n  \"overall_fit\": \"perfect\",\n  \"accepted_recommendation\": true,\n  \"chest_bust_note\": \"Comfortable ease across chest\",\n  \"comments\": \"Great fit!\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Feedback Performance Analytics",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{accessToken}}"}],
+            "url": "{{baseUrl}}/feedback/analytics"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin Endpoints",
+      "item": [
+        {
+          "name": "Verify Size Chart",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{adminToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": "{{baseUrl}}/admin/size-charts/1/verify",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"verification_status\": \"verified\",\n  \"data_source\": \"brand_official_garment_spec\",\n  \"notes\": \"Verified by merchandising QA\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Export Labelled Training CSV",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": "{{baseUrl}}/admin/feedback/export-csv"
+          }
+        },
+        {
+          "name": "List ML Prediction Logs",
+          "request": {
+            "method": "GET",
+            "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+            "url": "{{baseUrl}}/admin/prediction-logs"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Browser Extension Endpoints",
+      "item": [
+        {
+          "name": "Lookup Supported Product by URL",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/extension/lookup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page_url\": \"https://nordicthread.example.com/products/oxford-shirt-101\",\n  \"external_product_id\": \"NT-MT-101\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Extension Recommendation",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{accessToken}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "url": "{{baseUrl}}/extension/recommend",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page_url\": \"https://nordicthread.example.com/products/oxford-shirt-101\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Unsupported Website Lookup (Graceful 200)",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "url": "{{baseUrl}}/extension/lookup",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"page_url\": \"https://unsupported-store.example.net/item/123\"\n}"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+services:
+  backend:
+    build:
+      context: ./FIT/backend
+      dockerfile: Dockerfile
+    image: fitmate-backend:latest
+    container_name: fitmate-backend
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-sqlite:////app/data/size_recommendation.db}
+      ML_SERVICE_URL: http://backend:8000
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:3000,http://localhost:8000,chrome-extension://*}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - fitmate_db_data:/app/data
+    networks:
+      - fitmate_net
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import json, urllib.request; r = json.loads(urllib.request.urlopen('http://127.0.0.1:8000/api/v1/health', timeout=5).read()); assert r.get('status') == 'healthy' and r.get('models_ready', 0) >= 5, r"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 25s
+
+  frontend:
+    build:
+      context: ./FIT/frontend
+      dockerfile: Dockerfile
+    image: fitmate-frontend:latest
+    container_name: fitmate-frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "${FRONTEND_PORT:-5173}:5173"
+    networks:
+      - fitmate_net
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:5173/nginx-health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  fitmate_db_data:
+    name: fitmate_db_data
+
+networks:
+  fitmate_net:
+    name: fitmate_net
+    driver: bridge

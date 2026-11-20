@@ -1,0 +1,138 @@
+{
+  "model_name": "Model 2: Fit Recommendation Classifier",
+  "algorithm": "RandomForest",
+  "calibrated": true,
+  "target": "fit_class",
+  "target_classes": [
+    "tight",
+    "fit",
+    "loose"
+  ],
+  "label_mapping": {
+    "tight": 0,
+    "fit": 1,
+    "loose": 2
+  },
+  "features": {
+    "numeric": [
+      "height_cm",
+      "weight_kg",
+      "age",
+      "bust_cm",
+      "waist_cm",
+      "hip_cm",
+      "height_cm_was_missing",
+      "weight_kg_was_missing",
+      "age_was_missing",
+      "bust_cm_was_missing",
+      "waist_cm_was_missing",
+      "hip_cm_was_missing"
+    ],
+    "categorical": [
+      "category",
+      "size_label"
+    ],
+    "all": [
+      "height_cm",
+      "weight_kg",
+      "age",
+      "bust_cm",
+      "waist_cm",
+      "hip_cm",
+      "height_cm_was_missing",
+      "weight_kg_was_missing",
+      "age_was_missing",
+      "bust_cm_was_missing",
+      "waist_cm_was_missing",
+      "hip_cm_was_missing",
+      "category",
+      "size_label"
+    ]
+  },
+  "splitting_strategy": "GroupShuffleSplit on user_id (Zero user leakage)",
+  "imbalance_handling": "Balanced class/sample weights inside training folds only",
+  "training_dataset": {
+    "name": "data/processed/model_2_fit_data.parquet",
+    "sources": [
+      "Rent the Runway",
+      "ModCloth"
+    ],
+    "total_rows": 273676,
+    "train_rows": 219136,
+    "test_rows": 54540,
+    "unique_users_train": 118276,
+    "unique_users_test": 29570
+  },
+  "metrics": {
+    "baseline_majority_accuracy": 0.7232,
+    "baseline_macro_f1": 0.2798,
+    "balanced_model": {
+      "accuracy": 0.363,
+      "macro_f1": 0.3375,
+      "per_class": {
+        "tight": {
+          "precision": 0.1957,
+          "recall": 0.5505,
+          "f1": 0.2887,
+          "support": 7635
+        },
+        "fit": {
+          "precision": 0.7736,
+          "recall": 0.3045,
+          "f1": 0.437,
+          "support": 39443
+        },
+        "loose": {
+          "precision": 0.2043,
+          "recall": 0.48,
+          "f1": 0.2866,
+          "support": 7462
+        }
+      }
+    },
+    "calibrated_model": {
+      "accuracy": 0.7232,
+      "macro_f1": 0.2798,
+      "per_class": {
+        "tight": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 7635
+        },
+        "fit": {
+          "precision": 0.7232,
+          "recall": 1.0,
+          "f1": 0.8394,
+          "support": 39443
+        },
+        "loose": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 7462
+        }
+      }
+    },
+    "cv_comparison": {
+      "LogisticRegression": {
+        "cv_accuracy": 0.32074986477931783,
+        "cv_macro_f1": 0.30501654567252395
+      },
+      "RandomForest": {
+        "cv_accuracy": 0.37737463235590935,
+        "cv_macro_f1": 0.34468400174102815
+      },
+      "XGBoost": {
+        "cv_accuracy": 0.37484957672914376,
+        "cv_macro_f1": 0.34259082546785713
+      }
+    }
+  },
+  "training_date": "2026-11-15T10:58:17.521699",
+  "library_versions": {
+    "sklearn": "1.9.1",
+    "xgboost": "3.4.1",
+    "joblib": "1.6.0"
+  }
+}

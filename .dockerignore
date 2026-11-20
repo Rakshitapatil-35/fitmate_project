@@ -1,0 +1,31 @@
+# Git & IDE
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# Python caches & virtualenvs
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/.pytest_cache/
+**/.venv/
+**/venv/
+
+# Secrets & local databases (SQLite data lives in a persistent Docker volume)
+.env
+**/.env
+**/*.db
+**/*.db-journal
+**/*.sqlite*
+
+# Archives, reports & team docs (not needed inside runtime images)
+*.zip
+**/*.zip
+**/*.pdf
+TEAM_ASSIGNMENTS/
+TEAM_ZIPS/
+FIT/backend/reports/
+FIT/frontend/audit-report.html
+FIT/FITMATE_Comprehensive_Project_Report.md
+FITMATE_Audit_Report.md

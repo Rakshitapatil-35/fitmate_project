@@ -1,0 +1,96 @@
+{
+  "model_name": "FITMATE Model 5 (Fit Feedback Classifier)",
+  "selected_algorithm": "RandomForest",
+  "candidates_compared": {
+    "LogisticRegression": {
+      "cv_macro_f1_mean": 0.4092,
+      "cv_macro_f1_std": 0.0025
+    },
+    "RandomForest": {
+      "cv_macro_f1_mean": 0.4279,
+      "cv_macro_f1_std": 0.0053
+    },
+    "XGBoost": {
+      "cv_macro_f1_mean": 0.4264,
+      "cv_macro_f1_std": 0.0083
+    }
+  },
+  "calibration": "Sigmoid (CalibratedClassifierCV, 3-fold internal)",
+  "features": {
+    "numeric": [
+      "size",
+      "rating",
+      "height_cm",
+      "weight_kg",
+      "bust_band",
+      "waist_cm",
+      "hips_cm",
+      "size_deviation"
+    ],
+    "categorical": [
+      "category",
+      "cup_size",
+      "body_type"
+    ]
+  },
+  "label_mapping": {
+    "good_fit": 0,
+    "too_tight": 1,
+    "too_loose": 2
+  },
+  "training_date": "2026-11-15T07:52:50.634356+00:00",
+  "library_versions": {
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "joblib": "1.6.0"
+  },
+  "dataset": {
+    "source": "ModCloth + Rent The Runway (Harmonized E-Commerce Feedback Proxy)",
+    "total_clean_rows": 272871,
+    "train_rows": 60046,
+    "test_rows": 15174
+  },
+  "metrics": {
+    "majority_class_baseline": {
+      "class": "good_fit",
+      "accuracy": 0.7129,
+      "macro_f1": 0.2775
+    },
+    "test_evaluation": {
+      "accuracy": 0.5238,
+      "macro_f1": 0.4393,
+      "weighted_f1": 0.5607,
+      "multiclass_brier_score": 0.4258,
+      "log_loss": 0.7467,
+      "per_class": {
+        "good_fit": {
+          "precision": 0.8112,
+          "recall": 0.5459,
+          "f1_score": 0.6526,
+          "support": 10818
+        },
+        "too_tight": {
+          "precision": 0.2616,
+          "recall": 0.5214,
+          "f1_score": 0.3484,
+          "support": 2154
+        },
+        "too_loose": {
+          "precision": 0.2553,
+          "recall": 0.4173,
+          "f1_score": 0.3168,
+          "support": 2202
+        }
+      }
+    }
+  },
+  "privacy_compliance": {
+    "identifiers_included": false,
+    "user_id_saved": false,
+    "pii_check": "PASSED (Zero user keys stored in pipeline)",
+    "compliance_framework": "India DPDP Act 2023 - Anonymized & Aggregated"
+  },
+  "production_caveat": "Public e-commerce review proxy. Self-selection and subjective perception bias present. Model must be incrementally updated with real FITMATE customer feedback via /feedback endpoint."
+}

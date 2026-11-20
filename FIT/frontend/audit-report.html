@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FITMATE Project — Complete File-by-File Technical Audit & Bug Report</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #FFF7EE;
+      --surface: #FFFFFF;
+      --text-main: #14313A;
+      --text-muted: #55707A;
+      --coral: #FF6B6B;
+      --coral-bg: #FFE5E5;
+      --teal: #22A699;
+      --teal-bg: #E6F6F4;
+      --marigold: #D9822B;
+      --marigold-bg: #FEF8E7;
+      --border: rgba(20, 49, 58, 0.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      padding: 2rem 1.25rem 4rem;
+    }
+    .container {
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    .header-card {
+      background: linear-gradient(135deg, #FFFFFF 0%, #FFF9F2 100%);
+      border: 1px solid var(--border);
+      border-top: 5px solid var(--coral);
+      border-radius: 20px;
+      padding: 2.25rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 8px 24px rgba(20, 49, 58, 0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.28rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .badge-critical { background: var(--coral-bg); color: #B83535; }
+    .badge-high { background: var(--marigold-bg); color: #A86408; }
+    .badge-medium { background: var(--teal-bg); color: var(--teal); }
+    .badge-fixed { background: #E3F9ED; color: #177E49; }
+    h1 { font-size: 1.9rem; font-weight: 800; letter-spacing: -0.02em; margin: 0.5rem 0; }
+    h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      margin: 2rem 0 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--border);
+      color: var(--text-main);
+    }
+    .subtitle { color: var(--text-muted); font-size: 0.95rem; max-width: 680px; }
+    .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.65rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+    }
+    .btn-primary { background: var(--coral); color: #fff; }
+    .btn-secondary { background: #fff; color: var(--teal); border: 1.5px solid var(--teal); }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+    .stat-num { font-size: 2rem; font-weight: 800; color: var(--coral); line-height: 1.1; }
+    .stat-label { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-top: 0.25rem; }
+    .table-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow-x: auto;
+      box-shadow: 0 4px 16px rgba(20, 49, 58, 0.04);
+      margin-bottom: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+    th {
+      background: #14313A;
+      color: #FFFFFF;
+      padding: 0.9rem 1rem;
+      font-weight: 700;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    td {
+      padding: 0.95rem 1rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) { background: #FFFDF9; }
+    code {
+      font-family: Consolas, Monaco, 'Courier New', monospace;
+      background: #F4ECE1;
+      padding: 0.15rem 0.4rem;
+      border-radius: 5px;
+      font-size: 0.82rem;
+      color: #14313A;
+    }
+    .file-list {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .file-group h3 { font-size: 0.95rem; font-weight: 800; color: var(--teal); margin-bottom: 0.5rem; }
+    .file-group ul { list-style: none; font-size: 0.83rem; color: var(--text-muted); }
+    .file-group li { padding: 0.2rem 0; }
+    @media print {
+      body { background: #fff; padding: 0; }
+      .actions { display: none; }
+      .header-card, .table-wrap, .stat-card, .file-list { box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header-card">
+      <div>
+        <span class="badge badge-teal" style="background: var(--teal-bg); color: var(--teal);">FITMATE Technical Audit Report</span>
+        <h1>Complete File-by-File Problem &amp; Resolution Report</h1>
+        <p class="subtitle">
+          Exhaustive inspection of all files across <code>FIT/backend</code> (FastAPI, SQLAlchemy, 5 ML Models, SQLite) and <code>FIT/frontend</code> (SPA Router, Store, API Client, 9 Views). All 23 root causes identified and resolved.
+        </p>
+      </div>
+      <div class="actions">
+        <a href="./FITMATE_Audit_Report.pdf" download class="btn btn-primary">Download PDF Report</a>
+        <button onclick="window.print()" class="btn btn-secondary">Print / Save as PDF</button>
+        <a href="./" class="btn btn-secondary">← Back to FITMATE App</a>
+      </div>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">23</div>
+        <div class="stat-label">Total Defects Found &amp; Fixed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: var(--teal);">11</div>
+        <div class="stat-label">Backend, DB &amp; ML Pipeline Bugs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: var(--marigold);">12</div>
+        <div class="stat-label">Frontend State, API &amp; UI Bugs</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="color: #177E49;">55 / 55</div>
+        <div class="stat-label">Backend Pytest Tests Passing</div>
+      </div>
+    </div>
+
+    <h2>Part 1: Backend, Database &amp; ML Pipeline Problems (11 Issues)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 45px;">#</th>
+            <th style="width: 210px;">File &amp; Lines</th>
+            <th style="width: 95px;">Severity</th>
+            <th>Problem Occurring</th>
+            <th>Root Cause &amp; Fix Applied</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>1</strong></td>
+            <td><code>backend/app/config.py</code> (L19–65)<br/><code>backend/.env</code> (L9)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td><strong>Empty SQLite DB &amp; Missing Assets When Launched From Project Root</strong></td>
+            <td><code>DATABASE_URL="sqlite:///./size_recommendation.db"</code>, <code>ML_MODEL_PATH</code>, <code>EASE_CONFIG_PATH</code>, and <code>env_file=".env"</code> were relative to <code>os.getcwd()</code>. Starting uvicorn outside <code>FIT/backend</code> created an empty 0-row DB in the root directory. <strong>Fix:</strong> Anchored all paths to <code>BACKEND_DIR = Path(__file__).resolve().parent.parent</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>2</strong></td>
+            <td><code>backend/app/routers/measurements.py</code> (L50–257)<br/><code>backend/app/dependencies.py</code> (L77–101)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td><strong><code>POST /api/v1/measurements</code> Failed With <code>401 Unauthorized</code> for Guest Users</strong></td>
+            <td>The frontend allows guest users (<code>Continue as Guest</code>) to save measurements on <code>/measurements</code>, which calls <code>POST /api/v1/measurements</code> without a JWT token. The router required <code>get_current_user</code>, throwing <code>401 Unauthorized</code>. Also <code>PUT /measurements/{id}</code> dropped <code>body_shape</code>. <strong>Fix:</strong> Added <code>get_current_or_guest_user</code> dependency and persisted <code>body_shape</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>3</strong></td>
+            <td><code>backend/app/services/model_service.py</code> (L384–393)<br/><code>backend/src/predict.py</code> (L109–121)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td><strong>Metric Waist Measurements (50–78 cm) Were Multiplied by <code>2.54</code> Into <code>127–200 cm</code></strong></td>
+            <td><code>predict_size()</code> and <code>predict_fit()</code> passed <code>waist_raw</code> to <code>parse_inches_to_cm()</code> (multiplying by 2.54) and only reverted to cm if the result exceeded <code>200</code>. For a <code>74 cm</code> waist, <code>74 * 2.54 = 188.0 cm &lt;= 200</code>, so Models 1 &amp; 2 treated a 74 cm waist as a <strong>188 cm (74-inch)</strong> waist. <strong>Fix:</strong> Added <code>parse_circumference_to_cm()</code> so <code>[16, 50)</code> converts from inches while <code>[50, 220]</code> stays in cm.</td>
+          </tr>
+          <tr>
+            <td><strong>4</strong></td>
+            <td><code>backend/src/utils.py</code> (L115–157)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong><code>parse_bust_size("90cm")</code> Crashed With Out-of-Range <code>ValueError</code> (236.2 cm)</strong></td>
+            <td>The regex <code>^(\d{2})\s*([a-z]+)$</code> matched <code>"90cm"</code> as a 90-inch bra band with cup <code>"cm"</code> (+3 in), calculating <code>93 * 2.54 = 236.2 cm</code> and throwing a validation error. <strong>Fix:</strong> Parsed explicit <code>cm</code> and <code>in</code> suffixes first and restricted cup matching to valid bra cup letters (<code>aa–j</code>).</td>
+          </tr>
+          <tr>
+            <td><strong>5</strong></td>
+            <td><code>backend/src/predict.py</code> (L25–62)<br/><code>backend/app/ml/predictor.py</code> (L91–100)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong><code>FileNotFoundError</code> in <code>src/predict.py</code> Caused 14 Test Failures &amp; Tier-1 ML Fallback</strong></td>
+            <td><code>get_model_1()</code>, <code>get_model_2()</code>, and <code>get_model_3()</code> used CWD-relative <code>'models/model_*.joblib'</code>. Running outside <code>FIT/backend</code> caused Tier-1 ML inference and 14 tests in <code>tests/test_fitmate.py</code> to fail. <strong>Fix:</strong> Added <code>_resolve_model_path()</code> anchored to <code>FIT/backend</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>6</strong></td>
+            <td><code>backend/app/services/recommendation_service.py</code> (L23–39)<br/><code>backend/app/services/ml_client.py</code> (L150–200)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>User Weight Omitted &amp; Hardcoded <code>size=8.0</code> / <code>brand="FITMATE"</code> Used in ML Enrichment</strong></td>
+            <td><code>extract_profile_measurements_cm()</code> omitted <code>weight_kg</code>, causing Models 1, 2, 4, and 5 to always fall back to dummy weights (62–65 kg). In addition, <code>ml_client.py</code> hardcoded <code>size=8.0</code> for Model 5 and <code>brand="FITMATE"</code> for Model 3. <strong>Fix:</strong> Passed user weight, actual brand name, and mapped recommended size label to numeric size.</td>
+          </tr>
+          <tr>
+            <td><strong>7</strong></td>
+            <td><code>backend/seed.py</code> (L130–440)<br/><code>backend/app/main.py</code> (L30–45)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>Missing Featured Retail Brands (<code>Zara</code>, <code>H&amp;M</code>, <code>Levi's</code>, <code>Uniqlo</code>, <code>Mango</code>) in Database</strong></td>
+            <td><code>seed.py</code> only seeded 2 brands (<code>NordicThread</code>, <code>AuraAtelier</code>), while the frontend defaulted to <code>Zara</code>. Moreover, <code>main.py</code> did not call <code>seed_database()</code> on startup. <strong>Fix:</strong> Added all 5 retail brands, products, and verified size charts to <code>seed.py</code> and auto-seeded during FastAPI startup.</td>
+          </tr>
+          <tr>
+            <td><strong>8</strong></td>
+            <td><code>backend/app/models/catalog.py</code> (L119–135)<br/><code>backend/app/schemas/catalog.py</code> (L221–242)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong><code>ProductResponse</code> Missing <code>brand_name</code> and <code>category_code</code></strong></td>
+            <td><code>GET /api/v1/products</code> returned <code>brand_id</code> and <code>category_id</code> without <code>brand_name</code> or <code>category_code</code>, breaking frontend brand filtering (<code>p.brand_name === selectedBrandName</code>). <strong>Fix:</strong> Added <code>brand_name</code> and <code>category_code</code> properties to <code>Product</code> and <code>ProductResponse</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>9</strong></td>
+            <td><code>backend/app/routers/recommendations.py</code> (L50–101)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td><strong><code>GET /api/v1/recommendations</code> Failed With <code>401 Unauthorized</code> for Guests</strong></td>
+            <td><code>POST /api/v1/recommendations</code> allowed guests, but <code>GET /api/v1/recommendations</code> required <code>get_current_user</code>, failing on <code>/result</code> and <code>/history</code> for guests. <strong>Fix:</strong> Used <code>get_optional_current_user</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>10</strong></td>
+            <td><code>backend/app/routers/feedback.py</code> (L26–39)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td><strong>Guest Feedback Hardcoded <code>user_id = 1</code>, Risking Foreign Key <code>IntegrityError</code></strong></td>
+            <td><code>submit_feedback</code> hardcoded <code>user_id = 1</code> when unauthenticated, failing if user ID 1 did not exist. <strong>Fix:</strong> Used <code>get_current_or_guest_user</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>11</strong></td>
+            <td><code>backend/api/main.py</code> (L82–150)<br/><code>backend/tests/test_fitmate.py</code> (L9–22)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td><strong>Sync Endpoints in <code>api/main.py</code> + <code>TestClient</code> Hung in Windows Sandbox</strong></td>
+            <td><code>test_fitmate.py</code> used Starlette's thread-portal <code>TestClient</code> against sync <code>def</code> endpoints in <code>api/main.py</code>, hanging on Windows socketpairs. <strong>Fix:</strong> Converted <code>api/main.py</code> routes to <code>async def</code> and used <code>SyncASGITestClient</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Part 2: Frontend State, API Client, Router &amp; Page View Problems (12 Issues)</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 45px;">#</th>
+            <th style="width: 210px;">File &amp; Lines</th>
+            <th style="width: 95px;">Severity</th>
+            <th>Problem Occurring</th>
+            <th>Root Cause &amp; Fix Applied</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>12</strong></td>
+            <td><code>frontend/pages/AuthPage.js</code> (L192)<br/><code>frontend/state/store.js</code> (L183–196)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td><strong>Log In Crashed With <code>TypeError: store.login is not a function</code></strong></td>
+            <td><code>AuthPage.js</code> called <code>await store.login(email, password)</code>, which did not exist on <code>AppStore</code> in <code>store.js</code>. <strong>Fix:</strong> Implemented <code>store.login()</code> and <code>store.register()</code> on <code>AppStore</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>13</strong></td>
+            <td><code>frontend/pages/AuthPage.js</code> (L189)<br/><code>frontend/services/api.js</code> (L145–173)</td>
+            <td><span class="badge badge-critical">Critical</span></td>
+            <td><strong>Sign Up Crashed With <code>TypeError: email.trim is not a function</code></strong></td>
+            <td><code>AuthPage.js</code> passed an object <code>{ email, password, full_name }</code> to <code>api.register(email, fullName, password)</code>, which expected 3 strings and called <code>email.trim()</code>. <strong>Fix:</strong> Supported both object and positional arguments in <code>api.register()</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>14</strong></td>
+            <td><code>frontend/pages/AuthPage.js</code> (L163)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>"Auto-Fill" Demo User Button Filled Wrong Password (<code>401 Unauthorized</code>)</strong></td>
+            <td><code>btnFillDemo</code> filled <code>password123</code> for <code>alex@sizerec.example.com</code>, whereas <code>seed.py</code> seeds <code>UserPass123</code>. <strong>Fix:</strong> Updated demo password to <code>UserPass123</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>15</strong></td>
+            <td><code>frontend/app.js</code> (L116)<br/><code>frontend/services/api.js</code> (L257–259)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>Startup Crash <code>TypeError: api.getCurrentUserProfile is not a function</code></strong></td>
+            <td><code>initApp()</code> called <code>api.getCurrentUserProfile()</code> when restoring a session, which was missing from <code>ApiService</code>. <strong>Fix:</strong> Added <code>getCurrentUserProfile()</code> to <code>ApiService</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>16</strong></td>
+            <td><code>frontend/services/api.js</code> (L31–135)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>Stale <code>mock_jwt_*</code> Tokens in <code>localStorage</code> &amp; Unparsed Error Envelopes</strong></td>
+            <td>Offline mock tokens (<code>mock_jwt_access_*</code>) persisted in <code>localStorage</code> and caused <code>401 Unauthorized</code> once the backend started. Also, <code>api.js</code> ignored FastAPI's <code>errData.error.message</code> field. <strong>Fix:</strong> Auto-purged <code>mock_jwt_*</code> tokens, retried guest endpoints on 401, and parsed <code>errData.error.message</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>17</strong></td>
+            <td><code>frontend/pages/MeasurementsPage.js</code> (L590–625)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>"Save &amp; Continue" Button Permanently Frozen After Error &amp; Omitted <code>body_shape</code></strong></td>
+            <td><code>submitBtn.disabled = true</code> had no <code>finally</code> block to restore button state on error, and <code>body_shape</code> was omitted from the request payload. <strong>Fix:</strong> Added <code>finally</code> block and included <code>body_shape</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>18</strong></td>
+            <td><code>frontend/pages/MeasurementsPage.js</code> (L551–582)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td><strong>"AI Detect (Model 4)" Never Highlighted Any of the 4 Static Archetype Cards</strong></td>
+            <td>Model 4 returns NHANES cluster labels (e.g., <code>"Medium-Height - Balanced / Moderate Build"</code>), which did not match <code>Hourglass</code>, <code>Pear</code>, <code>Rectangle</code>, or <code>Apple</code>. <strong>Fix:</strong> Mapped body proportions to the corresponding visual archetype card while displaying the NHANES cluster match.</td>
+          </tr>
+          <tr>
+            <td><strong>19</strong></td>
+            <td><code>frontend/pages/BrandProductPickerPage.js</code> (L16–65)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>No "All Brands" Filter &amp; Cross-Brand Search Returned 0 Products</strong></td>
+            <td>Searching for <code>"Jeans"</code> or <code>"Chino"</code> while <code>Zara</code> was active returned 0 items. Also hardcoded <code>Stretch: 2%</code> and failed if <code>activeProfile.id</code> was a local mock timestamp. <strong>Fix:</strong> Added <code>"All Brands"</code> filter, cross-brand search, dynamic stretch %, and inline measurement fallback.</td>
+          </tr>
+          <tr>
+            <td><strong>20</strong></td>
+            <td><code>frontend/routes/router.js</code> (L103–106)<br/><code>frontend/pages/BrandProductPickerPage.js</code> (L213–231)</td>
+            <td><span class="badge badge-high">High</span></td>
+            <td><strong>Page Jumped to Top on Every Click &amp; Search Input Lost Focus After 300ms</strong></td>
+            <td>State updates fired <code>hashchange</code>, causing <code>router.handleRoute()</code> to scroll to <code>top: 0</code>, destroy focus on <code>#brand-search-input</code>, and re-fetch <code>/brands</code> and <code>/products</code> on every click. <strong>Fix:</strong> Preserved scroll position on same-route updates, restored search focus/caret, and cached catalog lists.</td>
+          </tr>
+          <tr>
+            <td><strong>21</strong></td>
+            <td><code>frontend/pages/ComparisonTablePage.js</code> (L32–90)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td><strong>Comparison Table Ignored Active Product Size Chart &amp; Recommended Size</strong></td>
+            <td><code>renderComparisonTablePage()</code> was synchronous and rendered a static mock table with <code>Size M</code> always marked as <code>Recommended</code>. <strong>Fix:</strong> Connected to live <code>api.getComparisonMatrix()</code>, <code>api.getMultiBrandComparison()</code>, and <code>latestRecommendation.recommended_size</code>.</td>
+          </tr>
+          <tr>
+            <td><strong>22</strong></td>
+            <td><code>frontend/pages/ResultPage.js</code> (L82–95, L201, L360)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td><strong>Hardcoded Model 2/3/5 Visuals &amp; <code>+-X cm ease</code> Sign Bug</strong></td>
+            <td>Negative ease rendered <code>+-1.5 cm ease</code>; Return Risk gauge was hardcoded to <code>16%</code>; Model 2 probability to <code>69%</code>; Radar chart labels to <code>68cm / 78cm / 41cm</code>. <strong>Fix:</strong> Connected all gauges and radar labels to live ML outputs and fixed sign formatting.</td>
+          </tr>
+          <tr>
+            <td><strong>23</strong></td>
+            <td><code>frontend/pages/OnboardingPage.js</code> (L342–350)<br/><code>frontend/pages/HistoryProfilesPage.js</code> (L40–48)</td>
+            <td><span class="badge badge-medium">Medium</span></td>
+            <td><strong>Onboarding Bounced Guests to Login &amp; Vault Demo Cards Couldn't Be Selected</strong></td>
+            <td>Finishing onboarding sent guests to <code>#/home</code> (<code>requiresAuth: true</code>), bouncing them to <code>#/auth</code>. Fallback profiles on <code>/history</code> were not synced to <code>store.state.profiles</code>. <strong>Fix:</strong> Routed guests to <code>#/measurements</code> after onboarding and synced fallback profiles to the store.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h2>Part 3: Complete Inventory of Audited Files</h2>
+    <div class="file-list">
+      <div class="file-group">
+        <h3>Backend Core &amp; Configuration</h3>
+        <ul>
+          <li>✓ <code>FIT/backend/app/main.py</code></li>
+          <li>✓ <code>FIT/backend/app/config.py</code></li>
+          <li>✓ <code>FIT/backend/app/database.py</code></li>
+          <li>✓ <code>FIT/backend/app/dependencies.py</code></li>
+          <li>✓ <code>FIT/backend/app/core/exceptions.py</code></li>
+          <li>✓ <code>FIT/backend/app/core/logging.py</code></li>
+          <li>✓ <code>FIT/backend/app/core/rate_limit.py</code></li>
+          <li>✓ <code>FIT/backend/app/core/security.py</code></li>
+          <li>✓ <code>FIT/backend/seed.py</code> &amp; <code>alembic/*</code></li>
+        </ul>
+      </div>
+      <div class="file-group">
+        <h3>Backend Routers, Models &amp; Schemas</h3>
+        <ul>
+          <li>✓ <code>FIT/backend/app/routers/auth.py</code></li>
+          <li>✓ <code>FIT/backend/app/routers/measurements.py</code></li>
+          <li>✓ <code>FIT/backend/app/routers/recommendations.py</code></li>
+          <li>✓ <code>FIT/backend/app/routers/brands.py</code> &amp; <code>products.py</code></li>
+          <li>✓ <code>FIT/backend/app/routers/comparison.py</code> &amp; <code>models.py</code></li>
+          <li>✓ <code>FIT/backend/app/routers/feedback.py</code> &amp; <code>users.py</code></li>
+          <li>✓ <code>FIT/backend/app/routers/admin.py</code> &amp; <code>extension.py</code></li>
+          <li>✓ <code>FIT/backend/app/models/*.py</code> (5 ORM files)</li>
+          <li>✓ <code>FIT/backend/app/schemas/*.py</code> (8 Schema files)</li>
+        </ul>
+      </div>
+      <div class="file-group">
+        <h3>ML Services, Training &amp; Tests</h3>
+        <ul>
+          <li>✓ <code>FIT/backend/app/services/model_service.py</code></li>
+          <li>✓ <code>FIT/backend/app/services/ml_client.py</code></li>
+          <li>✓ <code>FIT/backend/app/services/recommendation_service.py</code></li>
+          <li>✓ <code>FIT/backend/app/services/recommendation_engine.py</code></li>
+          <li>✓ <code>FIT/backend/app/services/unit_conversion.py</code></li>
+          <li>✓ <code>FIT/backend/app/ml/predictor.py</code> &amp; <code>model_loader.py</code></li>
+          <li>✓ <code>FIT/backend/src/predict.py</code> &amp; <code>src/utils.py</code></li>
+          <li>✓ <code>FIT/backend/src/train_model_1..3.py</code> &amp; <code>clean.py</code></li>
+          <li>✓ <code>FIT/backend/app/tests/*.py</code> &amp; <code>tests/test_fitmate.py</code></li>
+        </ul>
+      </div>
+      <div class="file-group">
+        <h3>Frontend SPA, Pages &amp; Components</h3>
+        <ul>
+          <li>✓ <code>FIT/frontend/index.html</code> &amp; <code>app.js</code></li>
+          <li>✓ <code>FIT/frontend/services/api.js</code></li>
+          <li>✓ <code>FIT/frontend/state/store.js</code></li>
+          <li>✓ <code>FIT/frontend/routes/router.js</code></li>
+          <li>✓ <code>FIT/frontend/pages/LandingPage.js</code> &amp; <code>AuthPage.js</code></li>
+          <li>✓ <code>FIT/frontend/pages/OnboardingPage.js</code> &amp; <code>DashboardPage.js</code></li>
+          <li>✓ <code>FIT/frontend/pages/MeasurementsPage.js</code></li>
+          <li>✓ <code>FIT/frontend/pages/BrandProductPickerPage.js</code></li>
+          <li>✓ <code>FIT/frontend/pages/ResultPage.js</code>, <code>ComparisonTablePage.js</code>, <code>HistoryProfilesPage.js</code></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
