@@ -438,4 +438,73 @@ export function onMountHistoryProfilesPage() {
     });
   });
     
+  // 2. Edit Profile Button
+  document.querySelectorAll('.btn-edit-profile').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      editingProfileId = Number(btn.dataset.id);
+      showProfileModal = true;
+      window.dispatchEvent(new CustomEvent('hashchange'));
+    });
+  });
+
+  // 3. Reset Profile Button
+  document.querySelectorAll('.btn-reset-profile').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.dataset.id);
+      btn.disabled = true;
+      try {
+        const resetProf = await api.resetMeasurementProfile(id);
+        await store.refreshProfiles();
+        if (resetProf) {
+          store.setActiveProfile(resetProf);
+          store.applyProfileToDraft(resetProf);
+        }
+        store.addToast('Profile reset to baseline defaults (logged in history).', 'info');
+        window.dispatchEvent(new CustomEvent('hashchange'));
+      } catch (err) {
+        store.addToast(err.message || 'Error resetting profile', 'error');
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  });
+
+  // 4. Favorite / Default toggle
+  document.querySelectorAll('.btn-toggle-favorite').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = Number(btn.dataset.id);
+      try {
+        await api.setDefaultMeasurementProfile(id);
+        await store.refreshProfiles();
+        store.addToast('Default profile updated.', 'success');
+        window.dispatchEvent(new CustomEvent('hashchange'));
+      } catch (err) {
+        store.addToast(err.message, 'error');
+      }
+    });
+  });
+
+  // 8. Open / Close Modal
+  const openModalBtn = document.getElementById('btn-open-create-profile');
+  const closeModalBtn = document.getElementById('btn-close-modal');
+  const cancelModalBtn = document.getElementById('btn-cancel-modal');
+
+  if (openModalBtn) {
+    openModalBtn.addEventListener('click', () => {
+      editingProfileId = null;
+      showProfileModal = true;
+      window.dispatchEvent(new CustomEvent('hashchange'));
+    });
+  }
+
+  const hideModal = () => {
+    showProfileModal = false;
+    editingProfileId = null;
+    window.dispatchEvent(new CustomEvent('hashchange'));
+  };
+
+  if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
+  if (cancelModalBtn) cancelModalBtn.addEventListener('click', hideModal);
+    
 }
