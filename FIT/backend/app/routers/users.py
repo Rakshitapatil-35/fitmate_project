@@ -13,3 +13,9 @@ from app.schemas.common import MessageResponse
 from app.schemas.user import UserResponse, UserUpdateRequest
 
 router = APIRouter(prefix="/users", tags=["Users"])
+
+
+@router.get("/me", response_model=UserResponse)
+async def get_my_profile(current_user: User = Depends(get_current_user)) -> User:
+    """Retrieve the authenticated user's profile."""
+    return current_user
