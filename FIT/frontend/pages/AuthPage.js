@@ -213,4 +213,98 @@ function validateAuthInputs(isSignup, email, name, password) {
 
 export function onMountAuthPage(params = {}) {
   attachTopNavEvents();
+
+  const tabLogin = document.getElementById('tab-login');
+  const tabSignup = document.getElementById('tab-signup');
+  const btnFillDemo = document.getElementById('btn-fill-demo');
+  const btnTogglePass = document.getElementById('btn-toggle-password');
+  const iconTogglePass = document.getElementById('icon-toggle-password');
+  const passInput = document.getElementById('auth-password');
+  const form = document.getElementById('auth-form');
+
+  if (btnTogglePass && passInput) {
+    btnTogglePass.addEventListener('click', () => {
+      const isHidden = passInput.type === 'password';
+      passInput.type = isHidden ? 'text' : 'password';
+      if (iconTogglePass) {
+        iconTogglePass.textContent = isHidden ? 'visibility_off' : 'visibility';
+      }
+    });
+  }
+
+  if (tabLogin) {
+    tabLogin.addEventListener('click', () => {
+      authMode = 'login';
+      const redirectParam = params?.redirect ? `&redirect=${encodeURIComponent(params.redirect)}` : '';
+      window.location.hash = `#/auth?mode=login${redirectParam}`;
+    });
+  }
+
+  if (tabSignup) {
+    tabSignup.addEventListener('click', () => {
+      authMode = 'signup';
+      const redirectParam = params?.redirect ? `&redirect=${encodeURIComponent(params.redirect)}` : '';
+      window.location.hash = `#/auth?mode=signup${redirectParam}`;
+    });
+  }
+
+  if (btnFillDemo) {
+    btnFillDemo.addEventListener('click', () => {
+      const emailInput = document.getElementById('auth-email');
+      const nameInput = document.getElementById('auth-name');
+      if (emailInput) emailInput.value = 'alex@sizerec.example.com';
+      if (passInput) passInput.value = 'UserPass123';
+      if (nameInput && !nameInput.value) nameInput.value = 'Alex Rivera';
+      showFieldError('err-name', '');
+      showFieldError('err-email', '');
+      showFieldError('err-password', '');
+      store.addToast('Demo credentials filled (UserPass123).', 'info');
+    });
+  }
+
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const isSignup = authMode === 'signup';
+      const email = document.getElementById('auth-email')?.value.trim() || '';
+      const password = document.getElementById('auth-password')?.value || '';
+      const name = document.getElementById('auth-name')?.value.trim() || '';
+
+      if (!validateAuthInputs(isSignup, email, name, password)) {
+        return;
+      }
+
+      const submitBtn = document.getElementById('btn-auth-submit');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span>${isSignup ? 'Creating account & signing you in...' : 'Signing in...'}</span>`;
+      }
+
+      try {
+        if (isSignup) {
+          await store.register(email, name, password);
+          store.addToast(`Welcome to FITMATE, ${name}!`, 'success');
+        } else {
+          await store.login(email, password);
+          store.addToast('Welcome back! Your saved profiles are ready.', 'success');
+        }
+
+        const targetRoute = params?.redirect || '/gender';
+        window.location.hash = `#${targetRoute.startsWith('/') ? targetRoute : '/' + targetRoute}`;
+      } catch (err) {
+        const message = err.message || 'Authentication failed. Please verify your credentials.';
+        const generalErr = document.getElementById('auth-general-error');
+        if (generalErr) {
+          generalErr.textContent = message;
+          generalErr.style.display = 'block';
+        }
+        store.addToast(message, 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span>${authMode === 'signup' ? 'Create Account & Continue' : 'Sign In & Continue'}</span><span class="material-symbols-outlined" style="font-size: 19px; color: var(--color-champagne-gold);">arrow_forward</span>`;
+        }
+      }
+    });
+  }
 }
