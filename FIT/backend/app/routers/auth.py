@@ -30,3 +30,32 @@ from app.schemas.common import MessageResponse
 from app.schemas.user import UserResponse
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
+
+
+@router.post(
+    "/register",
+    response_model=UserResponse,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(rate_limit_auth)],
+)
+async def register_user(
+    payload: UserRegisterRequest,
+    db: Session = Depends(get_db),
+) -> User:
+    """Register a new standard user account with bcrypt password hashing."""
+    normalized_email = payload.email.lower().strip()
+    existing = db.scalar(select(User).where(User.email == normalized_email))
+    if existing is not None:
+        raise ConflictException(f"An account with email '{normalized_email}' is already registered.")
+
+    user = User(
+        email=normalized_email,
+        full_name=payload.full_name.strip(),
+        hashed_password=hash_password(payload.password),
+        role="user",
+        is_active=True,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
