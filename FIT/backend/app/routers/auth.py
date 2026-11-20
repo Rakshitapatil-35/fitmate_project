@@ -136,3 +136,45 @@ async def refresh_access_token(
         user_id=user.id,
         role=user.role,
     )
+
+
+@router.post("/logout", response_model=MessageResponse)
+async def logout_user(
+    payload: LogoutRequest | None = None,
+    token_payload: Dict[str, Any] = Depends(get_current_token_payload),
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    """Revoke the current access token (and optional refresh token) in the token blacklist."""
+    user_id = int(str(token_payload["sub"]))
+    access_jti = str(token_payload["jti"])
+    access_exp = datetime.fromtimestamp(int(token_payload["exp"]), tz=timezone.utc)
+
+    if not db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == access_jti)):
+        db.add(
+            TokenBlacklist(
+                jti=access_jti,
+                token_type="access",
+                user_id=user_id,
+                expires_at=access_exp,
+            )
+        )
+
+    if payload and payload.refresh_token:
+        try:
+            ref_decoded = decode_token(payload.refresh_token, expected_type="refresh")
+            ref_jti = str(ref_decoded["jti"])
+            ref_exp = datetime.fromtimestamp(int(ref_decoded["exp"]), tz=timezone.utc)
+            if not db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == ref_jti)):
+                db.add(
+                    TokenBlacklist(
+                        jti=ref_jti,
+                        token_type="refresh",
+                        user_id=user_id,
+                        expires_at=ref_exp,
+                    )
+                )
+        except Exception:
+            pass
+
+    db.commit()
+    return MessageResponse(success=True, message="Successfully logged out and revoked session token.")
