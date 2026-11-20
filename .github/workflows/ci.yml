@@ -57,10 +57,12 @@ jobs:
           EOF
 
       - name: Run full backend & ML pytest suite
+        working-directory: FIT/backend
         env:
+          PYTHONPATH: .
           JWT_SECRET_KEY: ${{ secrets.CI_JWT_SECRET_KEY || 'ci-test-only-jwt-secret-key-min-32-bytes-long' }}
         run: |
-          python -m pytest FIT/backend/app/tests FIT/backend/tests -v --tb=short
+          python -m pytest app/tests tests -v --tb=short
 
   frontend-build-and-check:
     name: Frontend Build & Asset Verification
