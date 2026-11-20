@@ -267,3 +267,169 @@ export function onMountGenderPage() {
   });
 }
 
+/* ============================================================================
+ * PHASE 4.3: CLOTHING CATEGORY SELECTION PAGE (#/category)
+ * Women: Tops, Bottoms, Dresses
+ * Men: Tops, Bottoms
+ * ============================================================================ */
+export function renderCategoryPage() {
+  const { draftMeasurements } = store.getState();
+  const isMale = draftMeasurements.gender === 'male';
+  const currentGroup = draftMeasurements.categoryGroup || 'tops';
+
+  const genderKey = isMale ? 'male' : 'female';
+  const categories = [
+    {
+      group: 'tops',
+      title: 'Tops',
+      subtitle: isMale
+        ? 'Tailored Shirts, Polos, T-Shirts, Knitwear & Overshirts'
+        : 'Blouses, Poplin Shirts, Knitwear, Tees & Cropped Silhouettes',
+      badge: 'Bust/Chest • Waist • Height • Shoulder (Opt)',
+      img: getCategoryImage(genderKey, 'tops'),
+    },
+    {
+      group: 'bottoms',
+      title: 'Bottoms',
+      subtitle: isMale
+        ? 'Tailored Trousers, Straight, Loose, Baggy, Cargo, Track Pants & Shorts'
+        : 'High-Waist Trousers, Wide-Leg, Straight, Cargo, Track Pants & Skinny',
+      badge: 'Waist • Hips • Height • Inseam (Opt)',
+      img: getCategoryImage(genderKey, 'bottoms'),
+    },
+  ];
+
+  if (!isMale) {
+    categories.push({
+      group: 'dresses',
+      title: 'Dresses',
+      subtitle: 'Bodycon, A-Line, Flowing Maxi Dresses & Tailored Jumpsuits',
+      badge: 'Bust • Waist • Hips • Height • Shoulder (Opt)',
+      img: getCategoryImage('female', 'dresses'),
+    });
+  }
+
+  return `
+    <div class="app-shell">
+      ${renderTopNav('/category')}
+      ${renderToasts()}
+
+      <main class="main-content" style="max-width: 980px;">
+        ${renderFlowStepper(2)}
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+          <div>
+            <span class="fm-chip fm-chip-marigold" style="margin-bottom: 0.5rem;">
+              Step 2 of 4 • ${isMale ? "Men's" : "Women's"} Garment Category
+            </span>
+            <h1 class="fm-serif" style="font-size: clamp(1.9rem, 3.8vw, 2.65rem); font-weight: 700; color: var(--color-dark-chocolate); margin-bottom: 0.25rem;">
+              Select a Clothing Category
+            </h1>
+            <p style="font-size: 0.94rem; color: var(--color-text-muted);">
+              Each category activates its dedicated pattern grading strategy and required body measurements.
+            </p>
+          </div>
+
+          <a href="#/gender" class="fm-btn fm-btn-secondary fm-btn-sm">
+            <span class="material-symbols-outlined" style="font-size: 16px;">swap_horiz</span>
+            <span>Switch Department (${isMale ? 'Men' : 'Women'})</span>
+          </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(275px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+          ${categories
+            .map((cat) => {
+              const isSelected = currentGroup === cat.group;
+              return `
+                <div class="category-visual-card fm-card" data-group="${cat.group}" role="button" tabindex="0" style="cursor: pointer; padding: 1.2rem; border: 2px solid ${
+                isSelected ? 'var(--color-champagne-gold)' : 'var(--color-muted-beige)'
+              }; background: var(--color-white); display: flex; flex-direction: column; justify-content: space-between;">
+                  <div>
+                    <div class="fm-img-frame" style="height: 255px; margin-bottom: 1.15rem;">
+                      <img
+                        src="${cat.img}"
+                        alt="${isMale ? "Men's" : "Women's"} ${cat.title}"
+                        loading="eager"
+                        onerror="this.src='./assets/brand/fitmate-emblem.jpg'"
+                      />
+                      ${
+                        isSelected
+                          ? `<div style="position: absolute; top: 0.75rem; right: 0.75rem; background: var(--color-espresso); color: var(--color-champagne-gold); border-radius: 50%; width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center;"><span class="material-symbols-outlined" style="font-size: 18px;">check</span></div>`
+                          : ''
+                      }
+                    </div>
+
+                    <div style="padding: 0 0.25rem;">
+                      <h2 class="fm-serif" style="font-size: 1.65rem; font-weight: 700; color: var(--color-dark-chocolate); margin-bottom: 0.3rem;">
+                        ${cat.title}
+                      </h2>
+                      <p style="font-size: 0.85rem; color: var(--color-text-muted); line-height: 1.5; margin-bottom: 1rem;">
+                        ${cat.subtitle}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div style="font-size: 0.72rem; font-weight: 700; color: var(--color-espresso); background: var(--color-soft-cream); border: 1px solid var(--color-border-subtle); padding: 0.45rem 0.65rem; border-radius: var(--radius-xs); margin-bottom: 1rem; text-align: center;">
+                      ${cat.badge}
+                    </div>
+
+                    <span class="fm-btn ${isSelected ? 'fm-btn-primary' : 'fm-btn-secondary'} fm-btn-block" style="pointer-events: none;">
+                      <span>Continue with ${cat.title}</span>
+                      <span class="material-symbols-outlined" style="font-size: 18px; color: var(--color-champagne-gold);">arrow_forward</span>
+                    </span>
+                  </div>
+                </div>
+              `;
+            })
+            .join('')}
+        </div>
+
+        <div>
+          <a href="#/gender" class="fm-btn fm-btn-secondary fm-btn-sm">
+            <span class="material-symbols-outlined" style="font-size: 17px;">arrow_back</span>
+            <span>Back to Gender Selection</span>
+          </a>
+        </div>
+      </main>
+
+      ${renderBottomTabBar('/category')}
+    </div>
+  `;
+}
+
+export function onMountCategoryPage() {
+  attachTopNavEvents();
+
+  document.querySelectorAll('.category-visual-card').forEach((card) => {
+    const handleSelect = () => {
+      const group = card.dataset.group;
+      store.setCategory(group);
+
+      const { draftMeasurements } = store.getState();
+      const savedForCat = store.findSavedProfileForCategory(draftMeasurements.gender, draftMeasurements.categoryCode);
+      if (savedForCat) {
+        store.setDraftMeasurements({
+          height: savedForCat.height_cm || draftMeasurements.height,
+          weight: savedForCat.weight_kg || draftMeasurements.weight,
+          chest: savedForCat.chest_bust_cm || draftMeasurements.chest,
+          waist: savedForCat.waist_cm || draftMeasurements.waist,
+          hips: savedForCat.hips_cm || draftMeasurements.hips,
+          shoulder: savedForCat.shoulder_cm != null ? savedForCat.shoulder_cm : draftMeasurements.shoulder,
+          inseam: savedForCat.inseam_cm != null ? savedForCat.inseam_cm : draftMeasurements.inseam,
+        });
+      }
+
+      window.location.hash = '#/measurements';
+    };
+
+    card.addEventListener('click', handleSelect);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleSelect();
+      }
+    });
+  });
+}
+
