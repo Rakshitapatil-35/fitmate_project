@@ -433,3 +433,10 @@ export function onMountCategoryPage() {
   });
 }
 
+export function renderOnboardingPage() {
+  return renderGenderPage();
+}
+
+export function onMountOnboardingPage() {
+  return onMountGenderPage();
+}
