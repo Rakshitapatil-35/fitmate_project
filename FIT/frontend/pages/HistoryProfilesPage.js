@@ -259,7 +259,7 @@ export async function renderHistoryProfilesPage() {
           </div>
         </div>
   ` : ''}
-        ${false ? `
+        ${true ? `
         <!-- Recent Size Verdicts Section -->
         <div style="margin-bottom: 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
