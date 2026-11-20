@@ -1,6 +1,12 @@
 /**
  * ============================================================================
  * STEP 7 & 8: SAVED PROFILES & EDIT MEASUREMENTS SCREEN (#/history)
+ * - Displays saved measurements per category (Tops, Bottoms, Dresses) and gender
+ * - Includes an Edit option on each saved measurement card (Requirement 8)
+ * - Editing updates stored measurements via PATCH /api/v1/measurements/{id},
+ *   keeps a timestamped history log so the user can see changes over time,
+ *   and re-runs cross-brand recommendations with the new values
+ * - Includes Reset (POST /api/v1/measurements/{id}/reset) and Delete options
  * ============================================================================
  */
 
@@ -83,11 +89,314 @@ export async function renderHistoryProfilesPage() {
     <div class="app-shell">
       ${renderTopNav('/history')}
       ${renderToasts()}
-      <main class="main-content" style="max-width: 920px;"></main>
+
+      <main class="main-content" style="max-width: 920px;">
+        ${true ? `
+        <!-- Vault Header & Summary Banner -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <span style="width: 10px; height: 10px; border-radius: 50%; background: var(--color-secondary);"></span>
+            <span style="font-size: 0.82rem; font-weight: 700; color: var(--color-text-muted); text-transform: uppercase;">Saved Measurements & Fit History</span>
+          </div>
+          <div style="display: flex; gap: 0.6rem;">
+            <a href="#/gender" class="fm-btn fm-btn-secondary fm-btn-sm">
+              <span class="material-symbols-outlined" style="font-size: 17px;">add_circle</span>
+              <span>New Sizing Flow</span>
+            </a>
+            <button type="button" id="btn-open-create-profile" class="fm-btn fm-btn-primary fm-btn-sm fm-btn-glow" style="padding: 0.45rem 1rem;">
+              <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
+              <span>+ Add Profile</span>
+            </button>
+          </div>
+        </div>
+  ` : ''}
+        ${false ? `
+        <!-- Vault Stats Card -->
+        <div class="fm-card tilt-card" style="margin-bottom: 1.75rem; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="width: 3.5rem; height: 3.5rem; border-radius: var(--radius-pill); background: var(--color-surface-subtle); display: flex; align-items: center; justify-content: center;">
+              <span class="material-symbols-outlined" style="font-size: 32px; color: var(--color-secondary);">account_circle</span>
+            </div>
+            <div>
+              <h1 style="font-size: 1.3rem; font-weight: 800; color: var(--color-text-main); margin-bottom: 0.2rem;">
+                ${user?.full_name || 'Your'} Saved Measurements Vault
+              </h1>
+              <p style="font-size: 0.82rem; color: var(--color-text-muted);">
+                ${userProfiles.length} Saved Profiles • ${recs.length} Past Size Verdicts • Edit anytime to re-run recommendations
+              </p>
+            </div>
+          </div>
+
+          <div class="fm-chip fm-chip-teal" style="font-size: 0.75rem; padding: 0.35rem 0.85rem;">
+            <span class="material-symbols-outlined" style="font-size: 16px;">${isAuthenticated ? 'cloud_done' : 'person_outline'}</span>
+            <span>${isAuthenticated ? 'Database Synced' : 'Guest Session'}</span>
+          </div>
+        </div>
+  ` : ''}
+        ${false ? `
+        <!-- Saved Profiles Grid with Edit, Reset, Delete, and Change History -->
+        <div style="margin-bottom: 2.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
+            <h2 style="font-size: 1.15rem; font-weight: 800; color: var(--color-text-main); margin: 0;">
+              Saved Category & Gender Profiles
+            </h2>
+            <span style="font-size: 0.75rem; color: var(--color-text-muted);">
+              Click <strong>Edit</strong> to update measurements & automatically re-run recommendations
+            </span>
+          </div>
+
+          <div id="profiles-sortable-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(290px, 1fr)); gap: 1.15rem;">
+            ${userProfiles
+              .map((prof) => {
+                const isSelected = currentProf && currentProf.id === prof.id;
+                const isDefault = prof.is_default;
+                const historyEntries = Array.isArray(prof.history) ? prof.history : [];
+                const updatedLabel = prof.updated_at ? new Date(prof.updated_at).toLocaleString() : 'Saved';
+                const catLabel = prof.target_category
+                  ? prof.target_category.replace('womens_', "Women's ").replace('mens_', "Men's ")
+                  : prof.gender === 'male'
+                  ? "Men's Profile"
+                  : "Women's Profile";
+
+                const catGroup = prof.target_category?.includes('dresses')
+                  ? 'dresses'
+                  : prof.target_category?.includes('bottoms')
+                  ? 'bottoms'
+                  : 'tops';
+                const thumbImg = getCategoryImage(prof.gender, catGroup);
+
+                return `
+                  <div class="fm-card profile-card tilt-card" draggable="true" data-id="${prof.id}" style="padding: 1.25rem; border: 2px solid ${
+                  isSelected ? 'var(--color-champagne-gold)' : 'var(--color-border)'
+                }; background: #FFFFFF; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+                    <div>
+                      <!-- Card Header with Category Editorial Thumbnail -->
+                      <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.55rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                          <img src="${thumbImg}" alt="${catLabel}" style="width: 48px; height: 58px; object-fit: cover; border-radius: var(--radius-xs); border: 1px solid var(--color-muted-beige); flex-shrink: 0;" onerror="this.src='./assets/brand/fitmate-emblem-crop.jpg'" />
+                          <div>
+                            <div style="display: flex; align-items: center; gap: 0.4rem;">
+                              <span class="fm-serif" style="font-weight: 700; font-size: 1.2rem; color: var(--color-dark-chocolate);">${prof.profile_name}</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 0.25rem; flex-wrap: wrap;">
+                              <span class="fm-chip fm-chip-teal" style="font-size: 0.68rem; padding: 0.1rem 0.5rem; text-transform: capitalize;">
+                                ${catLabel}
+                              </span>
+                              ${
+                                prof.fit_style
+                                  ? `<span class="fm-chip fm-chip-marigold" style="font-size: 0.68rem; padding: 0.1rem 0.5rem;">Style: ${prof.fit_style}</span>`
+                                  : ''
+                              }
+                            </div>
+                          </div>
+                        </div>
+
+                        <button type="button" class="btn-toggle-favorite" data-id="${prof.id}" style="background: none; border: none; cursor: pointer; color: ${
+                  isDefault ? 'var(--color-primary)' : 'var(--color-text-light)'
+                }; padding: 0.2rem;" title="${isDefault ? 'Default profile' : 'Set as default'}">
+                          <span class="material-symbols-outlined" style="font-size: 20px;">${isDefault ? 'favorite' : 'favorite_border'}</span>
+                        </button>
+                      </div>
+
+                      <div style="font-size: 0.72rem; color: var(--color-text-muted); margin-bottom: 0.75rem;">
+                        Last updated: <strong>${updatedLabel}</strong>
+                      </div>
+
+                      <!-- Measurements Grid -->
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.45rem; font-size: 0.8rem; margin-bottom: 0.85rem; background: var(--color-bg); padding: 0.65rem; border-radius: var(--radius-md); border: 1px solid var(--color-border-subtle);">
+                        <div>Bust/Chest: <strong>${prof.chest_bust_cm ?? '–'} cm</strong></div>
+                        <div>Waist: <strong>${prof.waist_cm ?? '–'} cm</strong></div>
+                        <div>Hips: <strong>${prof.hips_cm ?? '–'} cm</strong></div>
+                        <div>Height: <strong>${prof.height_cm ?? '–'} cm</strong></div>
+                        <div>Shoulder: <strong>${prof.shoulder_cm != null ? `${prof.shoulder_cm} cm` : 'Skipped'}</strong></div>
+                        <div>Inseam: <strong>${prof.inseam_cm != null ? `${prof.inseam_cm} cm` : 'Skipped'}</strong></div>
+                      </div>
+
+                      ${
+                        false && historyEntries.length > 0
+                          ? `
+                        <details style="margin-bottom: 0.9rem; background: var(--color-surface-subtle); padding: 0.5rem 0.7rem; border-radius: var(--radius-sm);">
+                          <summary style="font-size: 0.74rem; font-weight: 800; color: var(--color-secondary); cursor: pointer;">
+                            Timestamped Change History (${historyEntries.length})
+                          </summary>
+                          <div style="margin-top: 0.4rem; max-height: 110px; overflow-y: auto;">
+                            ${historyEntries.slice().reverse().map(formatHistoryEntry).join('')}
+                          </div>
+                        </details>
+                      `
+                          : ''
+                      }
+                    </div>
+
+                    
+                  </div>
+                `;
+              })
+              .join('')}
+          </div>
+        </div>
+  ` : ''}
+        ${false ? `
+        <!-- Recent Size Verdicts Section -->
+        <div style="margin-bottom: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <span class="material-symbols-outlined" style="font-size: 20px; color: var(--color-secondary);">history</span>
+              <h3 style="font-size: 1.15rem; font-weight: 800; color: var(--color-text-main); margin: 0;">Recent Size Verdicts</h3>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--color-text-muted);">Showing ${recs.length} saved</span>
+          </div>
+
+          ${
+            recs.length === 0
+              ? `
+              <div class="fm-card" style="text-align: center; padding: 2.25rem 1.5rem;">
+                <span class="material-symbols-outlined" style="font-size: 36px; color: var(--color-secondary); margin-bottom: 0.5rem;">history_toggle_off</span>
+                <h4 style="font-size: 1.05rem; font-weight: 800; color: var(--color-text-main); margin-bottom: 0.3rem;">No Size Verdicts Yet</h4>
+                <p style="font-size: 0.82rem; color: var(--color-text-muted); margin-bottom: 1rem;">Choose a fit style to generate your cross-brand size recommendations.</p>
+                <a href="#/fit-style" class="fm-btn fm-btn-primary fm-btn-sm fm-btn-glow">Choose Fit Style</a>
+              </div>
+            `
+              : `
+              <div style="display: flex; flex-direction: column; gap: 0.85rem;">
+                ${recs
+                  .map((r) => {
+                    const brand = r.brand_name || 'Zara';
+                    const name = r.product_name || 'Tailored Garment';
+                    const size = r.recommended_size || 'M';
+                    const score = r.score ? Math.round(r.score) : 96;
+
+                    return `
+                      <div class="fm-card tilt-card" style="padding: 1.15rem; display: flex; flex-direction: column; gap: 0.65rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                          <div style="display: flex; align-items: center; gap: 0.85rem;">
+                            <div style="width: 3.25rem; height: 3.5rem; border-radius: var(--radius-md); background: var(--color-surface-subtle); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                              <span class="material-symbols-outlined" style="font-size: 26px; color: var(--color-secondary);">apparel</span>
+                            </div>
+                            <div>
+                              <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.2rem;">
+                                <span class="fm-chip fm-chip-teal" style="font-size: 0.7rem; padding: 0.1rem 0.5rem;">${brand}</span>
+                                <span style="font-size: 0.75rem; color: var(--color-text-muted);">Confidence: ${score}%</span>
+                              </div>
+                              <h4 style="font-size: 0.98rem; font-weight: 800; color: var(--color-text-main); margin-bottom: 0.15rem;">${name}</h4>
+                              <p style="font-size: 0.75rem; color: var(--color-text-muted); margin: 0;">
+                                ${r.created_at ? new Date(r.created_at).toLocaleString() : 'Saved recently'}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div class="fm-chip fm-chip-coral" style="font-size: 0.95rem; font-weight: 800; padding: 0.35rem 0.95rem;">
+                            Size ${size}
+                          </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border-subtle); padding-top: 0.5rem;">
+                          <button type="button" class="btn-reuse-rec fm-btn fm-btn-ghost fm-btn-sm" data-id="${r.recommendation_id}" style="color: var(--color-secondary); font-weight: 700; padding: 0.25rem 0.5rem;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">cached</span>
+                            <span>View Cross-Brand Recommendations</span>
+                          </button>
+
+                          <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <button type="button" class="btn-delete-rec fm-btn fm-btn-ghost fm-btn-sm" data-id="${r.recommendation_id}" style="color: var(--color-error); font-weight: 700; padding: 0.25rem 0.5rem;">
+                              <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                              <span>Delete</span>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    `;
+                  })
+                  .join('')}
+              </div>
+            `
+          }
+        </div>
+  ` : ''}
+        ${false ? `
+        <!-- Edit / Create Profile Modal Dialog (Requirement 8) -->
+        <div id="new-profile-modal" style="display: ${showProfileModal ? 'flex' : 'none'}; position: fixed; inset: 0; background: rgba(20, 49, 58, 0.45); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
+          <div class="fm-card" style="width: 100%; max-width: 520px; padding: 1.75rem; max-height: 92vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.15rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--color-text-main); margin: 0;">
+                ${editingProf ? `Edit "${editingProf.profile_name}"` : 'Add New Measurement Profile'}
+              </h3>
+              <button type="button" id="btn-close-modal" style="background: none; border: none; cursor: pointer; color: var(--color-text-muted);">
+                <span class="material-symbols-outlined" style="font-size: 22px;">close</span>
+              </button>
+            </div>
+
+            <form id="create-profile-form">
+              <div class="fm-form-group" style="margin-bottom: 0.85rem;">
+                <label class="fm-label" for="new-prof-name">Profile Name</label>
+                <input type="text" id="new-prof-name" class="fm-input" value="${editingProf ? editingProf.profile_name : ''}" placeholder="e.g. Women's Tops Profile" required />
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-gender">Gender</label>
+                  <select id="new-prof-gender" class="fm-input">
+                    <option value="female" ${editingProf?.gender !== 'male' ? 'selected' : ''}>Women</option>
+                    <option value="male" ${editingProf?.gender === 'male' ? 'selected' : ''}>Men</option>
+                  </select>
+                </div>
+
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-category">Category</label>
+                  <select id="new-prof-category" class="fm-input">
+                    <option value="womens_tops" ${editingProf?.target_category === 'womens_tops' ? 'selected' : ''}>Women's Tops</option>
+                    <option value="womens_bottoms" ${editingProf?.target_category === 'womens_bottoms' ? 'selected' : ''}>Women's Bottoms</option>
+                    <option value="womens_dresses" ${editingProf?.target_category === 'womens_dresses' ? 'selected' : ''}>Women's Dresses</option>
+                    <option value="mens_tops" ${editingProf?.target_category === 'mens_tops' ? 'selected' : ''}>Men's Tops</option>
+                    <option value="mens_bottoms" ${editingProf?.target_category === 'mens_bottoms' ? 'selected' : ''}>Men's Bottoms</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.85rem;">
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-chest">Bust / Chest (cm)</label>
+                  <input type="number" step="0.5" id="new-prof-chest" class="fm-input" value="${editingProf ? (editingProf.chest_bust_cm ?? 92) : 92}" required />
+                </div>
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-waist">Waist (cm)</label>
+                  <input type="number" step="0.5" id="new-prof-waist" class="fm-input" value="${editingProf ? (editingProf.waist_cm ?? 74) : 74}" required />
+                </div>
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-hips">Hips (cm)</label>
+                  <input type="number" step="0.5" id="new-prof-hips" class="fm-input" value="${editingProf ? (editingProf.hips_cm ?? 98) : 98}" required />
+                </div>
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-height">Height (cm)</label>
+                  <input type="number" step="0.5" id="new-prof-height" class="fm-input" value="${editingProf ? (editingProf.height_cm ?? 168) : 168}" required />
+                </div>
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-shoulder">Shoulder (cm, Optional)</label>
+                  <input type="number" step="0.5" id="new-prof-shoulder" class="fm-input" value="${editingProf && editingProf.shoulder_cm != null ? editingProf.shoulder_cm : ''}" placeholder="Skip / Optional" />
+                </div>
+                <div class="fm-form-group" style="margin-bottom: 0;">
+                  <label class="fm-label" for="new-prof-inseam">Inseam (cm, Optional)</label>
+                  <input type="number" step="0.5" id="new-prof-inseam" class="fm-input" value="${editingProf && editingProf.inseam_cm != null ? editingProf.inseam_cm : ''}" placeholder="Skip / Optional" />
+                </div>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem; margin-top: 1.25rem;">
+                <button type="button" id="btn-cancel-modal" class="fm-btn fm-btn-secondary" style="flex: 1;">Cancel</button>
+                <button type="submit" id="btn-submit-profile-modal" class="fm-btn fm-btn-primary fm-btn-glow" style="flex: 2;">
+                  <span>${editingProf ? 'Update & Re-Run Recommendations' : 'Save Profile'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+  ` : ''}
+      </main>
+
       ${renderBottomTabBar('/history')}
     </div>
   `;
 }
 
 export function onMountHistoryProfilesPage() {
+  attachTopNavEvents();
+
 }
