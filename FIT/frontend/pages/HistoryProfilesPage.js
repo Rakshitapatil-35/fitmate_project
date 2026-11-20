@@ -507,4 +507,52 @@ export function onMountHistoryProfilesPage() {
   if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
   if (cancelModalBtn) cancelModalBtn.addEventListener('click', hideModal);
     
+  // 5. Delete Profile
+  document.querySelectorAll('.btn-quick-dismiss').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const id = Number(btn.dataset.id);
+      const card = btn.closest('.profile-card');
+      if (card) {
+        card.style.opacity = '0.3';
+      }
+      try {
+        await api.deleteMeasurementProfile(id);
+        await store.refreshProfiles();
+        store.addToast('Measurement profile deleted.', 'info');
+        window.dispatchEvent(new CustomEvent('hashchange'));
+      } catch (err) {
+        store.addToast(err.message || 'Error deleting profile', 'error');
+      }
+    });
+  });
+
+  // 6. Reuse recommendation
+  document.querySelectorAll('.btn-reuse-rec').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.dataset.id);
+      try {
+        const rec = await api.getRecommendation(id);
+        store.setLatestRecommendation(rec);
+        window.location.hash = '#/results';
+      } catch {
+        window.location.hash = '#/results';
+      }
+    });
+  });
+
+  // 7. Delete recommendation
+  document.querySelectorAll('.btn-delete-rec').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.dataset.id);
+      try {
+        await api.deleteRecommendation(id);
+        store.addToast('Recommendation removed from history.', 'info');
+        window.dispatchEvent(new CustomEvent('hashchange'));
+      } catch (err) {
+        store.addToast(err.message || 'Error deleting recommendation', 'error');
+      }
+    });
+  });
+    
 }
