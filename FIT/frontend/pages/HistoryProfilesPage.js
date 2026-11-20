@@ -20,7 +20,7 @@ import { triggerMultiBrandEvaluation } from './BrandProductPickerPage.js';
 import { flip, tilt3d } from '../components/motion.js';
 
 let showProfileModal = false;
-let editingProfileId = null;
+let editingProfileId = null; // null = creating new profile; number = editing existing profile
 let pendingDeletedProfile = null;
 let undoTimeoutId = null;
 
@@ -91,7 +91,6 @@ export async function renderHistoryProfilesPage() {
       ${renderToasts()}
 
       <main class="main-content" style="max-width: 920px;">
-        ${true ? `
         <!-- Vault Header & Summary Banner -->
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.75rem;">
           <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -109,8 +108,7 @@ export async function renderHistoryProfilesPage() {
             </button>
           </div>
         </div>
-  ` : ''}
-        ${true ? `
+
         <!-- Vault Stats Card -->
         <div class="fm-card tilt-card" style="margin-bottom: 1.75rem; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div style="display: flex; align-items: center; gap: 1rem;">
@@ -132,8 +130,7 @@ export async function renderHistoryProfilesPage() {
             <span>${isAuthenticated ? 'Database Synced' : 'Guest Session'}</span>
           </div>
         </div>
-  ` : ''}
-        ${true ? `
+
         <!-- Saved Profiles Grid with Edit, Reset, Delete, and Change History -->
         <div style="margin-bottom: 2.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
@@ -212,8 +209,9 @@ export async function renderHistoryProfilesPage() {
                         <div>Inseam: <strong>${prof.inseam_cm != null ? `${prof.inseam_cm} cm` : 'Skipped'}</strong></div>
                       </div>
 
+                      <!-- Timestamped Change History Log (Requirement 8) -->
                       ${
-                        true && historyEntries.length > 0
+                        historyEntries.length > 0
                           ? `
                         <details style="margin-bottom: 0.9rem; background: var(--color-surface-subtle); padding: 0.5rem 0.7rem; border-radius: var(--radius-sm);">
                           <summary style="font-size: 0.74rem; font-weight: 800; color: var(--color-secondary); cursor: pointer;">
@@ -228,7 +226,6 @@ export async function renderHistoryProfilesPage() {
                       }
                     </div>
 
-                    
                     <!-- Action Buttons: Use & Re-run, Edit, Reset, Delete -->
                     <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.45rem; border-top: 1px solid var(--color-border-subtle); padding-top: 0.75rem;">
                       <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
@@ -236,30 +233,31 @@ export async function renderHistoryProfilesPage() {
                           <span>${isSelected ? 'Use & Run' : 'Select'}</span>
                         </button>
 
+                        <!-- Edit Button (Requirement 8) -->
                         <button type="button" class="btn-edit-profile fm-btn fm-btn-secondary fm-btn-sm" data-id="${prof.id}" style="font-size: 0.75rem; padding: 0.35rem 0.75rem; color: var(--color-secondary); border-color: var(--color-secondary);">
                           <span class="material-symbols-outlined" style="font-size: 15px;">edit</span>
                           <span>Edit</span>
                         </button>
 
+                        <!-- Reset Button (Requirement 8) -->
                         <button type="button" class="btn-reset-profile fm-btn fm-btn-ghost fm-btn-sm" data-id="${prof.id}" style="font-size: 0.74rem; padding: 0.35rem 0.55rem; color: var(--color-marigold);" title="Reset profile measurements to baseline">
                           <span class="material-symbols-outlined" style="font-size: 16px;">restart_alt</span>
                           <span>Reset</span>
                         </button>
                       </div>
 
+                      <!-- Delete Button (Requirement 8) -->
                       <button type="button" class="btn-quick-dismiss fm-btn fm-btn-ghost fm-btn-sm" data-id="${prof.id}" style="color: var(--color-error); font-size: 0.75rem; padding: 0.3rem 0.5rem;" title="Delete profile">
                         <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
                       </button>
                     </div>
-                    
                   </div>
                 `;
               })
               .join('')}
           </div>
         </div>
-  ` : ''}
-        ${true ? `
+
         <!-- Recent Size Verdicts Section -->
         <div style="margin-bottom: 2rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -334,8 +332,7 @@ export async function renderHistoryProfilesPage() {
             `
           }
         </div>
-  ` : ''}
-        ${true ? `
+
         <!-- Edit / Create Profile Modal Dialog (Requirement 8) -->
         <div id="new-profile-modal" style="display: ${showProfileModal ? 'flex' : 'none'}; position: fixed; inset: 0; background: rgba(20, 49, 58, 0.45); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
           <div class="fm-card" style="width: 100%; max-width: 520px; padding: 1.75rem; max-height: 92vh; overflow-y: auto;">
@@ -411,7 +408,6 @@ export async function renderHistoryProfilesPage() {
             </form>
           </div>
         </div>
-  ` : ''}
       </main>
 
       ${renderBottomTabBar('/history')}
@@ -437,8 +433,8 @@ export function onMountHistoryProfilesPage() {
       }
     });
   });
-    
-  // 2. Edit Profile Button
+
+  // 2. Edit Profile Button -> Opens Modal pre-populated with profile measurements (Requirement 8)
   document.querySelectorAll('.btn-edit-profile').forEach((btn) => {
     btn.addEventListener('click', () => {
       editingProfileId = Number(btn.dataset.id);
@@ -447,7 +443,7 @@ export function onMountHistoryProfilesPage() {
     });
   });
 
-  // 3. Reset Profile Button
+  // 3. Reset Profile Button -> Calls POST /api/v1/measurements/{id}/reset (Requirement 8)
   document.querySelectorAll('.btn-reset-profile').forEach((btn) => {
     btn.addEventListener('click', async () => {
       const id = Number(btn.dataset.id);
@@ -485,29 +481,7 @@ export function onMountHistoryProfilesPage() {
     });
   });
 
-  // 8. Open / Close Modal
-  const openModalBtn = document.getElementById('btn-open-create-profile');
-  const closeModalBtn = document.getElementById('btn-close-modal');
-  const cancelModalBtn = document.getElementById('btn-cancel-modal');
-
-  if (openModalBtn) {
-    openModalBtn.addEventListener('click', () => {
-      editingProfileId = null;
-      showProfileModal = true;
-      window.dispatchEvent(new CustomEvent('hashchange'));
-    });
-  }
-
-  const hideModal = () => {
-    showProfileModal = false;
-    editingProfileId = null;
-    window.dispatchEvent(new CustomEvent('hashchange'));
-  };
-
-  if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
-  if (cancelModalBtn) cancelModalBtn.addEventListener('click', hideModal);
-    
-  // 5. Delete Profile
+  // 5. Delete Profile (Requirement 8)
   document.querySelectorAll('.btn-quick-dismiss').forEach((btn) => {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
@@ -554,5 +528,127 @@ export function onMountHistoryProfilesPage() {
       }
     });
   });
-    
+
+  // 8. Open / Close Modal
+  const openModalBtn = document.getElementById('btn-open-create-profile');
+  const closeModalBtn = document.getElementById('btn-close-modal');
+  const cancelModalBtn = document.getElementById('btn-cancel-modal');
+
+  if (openModalBtn) {
+    openModalBtn.addEventListener('click', () => {
+      editingProfileId = null;
+      showProfileModal = true;
+      window.dispatchEvent(new CustomEvent('hashchange'));
+    });
+  }
+
+  const hideModal = () => {
+    showProfileModal = false;
+    editingProfileId = null;
+    window.dispatchEvent(new CustomEvent('hashchange'));
+  };
+
+  if (closeModalBtn) closeModalBtn.addEventListener('click', hideModal);
+  if (cancelModalBtn) cancelModalBtn.addEventListener('click', hideModal);
+
+  // 9. Submit Edit or Create Form (PATCH /api/v1/measurements/{id} + Re-run recommendations)
+  const form = document.getElementById('create-profile-form');
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('new-prof-name')?.value.trim();
+      const gender = document.getElementById('new-prof-gender')?.value || 'female';
+      const targetCategory = document.getElementById('new-prof-category')?.value || 'womens_tops';
+      const chest = Number(document.getElementById('new-prof-chest')?.value) || 92;
+      const waist = Number(document.getElementById('new-prof-waist')?.value) || 74;
+      const hips = Number(document.getElementById('new-prof-hips')?.value) || 98;
+      const height = Number(document.getElementById('new-prof-height')?.value) || 168;
+      const shoulderRaw = document.getElementById('new-prof-shoulder')?.value.trim();
+      const inseamRaw = document.getElementById('new-prof-inseam')?.value.trim();
+
+      const shoulder = shoulderRaw ? Number(shoulderRaw) : null;
+      const inseam = inseamRaw ? Number(inseamRaw) : null;
+      const clearFields = [];
+      if (!shoulderRaw) clearFields.push('shoulder');
+      if (!inseamRaw) clearFields.push('inseam');
+
+      const submitBtn = document.getElementById('btn-submit-profile-modal');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Saving & Re-running Recommendations...</span>';
+      }
+
+      try {
+        let savedProf = null;
+        if (editingProfileId != null && editingProfileId < 1000000) {
+          savedProf = await api.patchMeasurementProfile(editingProfileId, {
+            profile_name: name || 'Updated Profile',
+            gender,
+            target_category: targetCategory,
+            unit: 'cm',
+            weight_unit: 'kg',
+            chest_bust: chest,
+            waist,
+            hips,
+            height,
+            shoulder,
+            inseam,
+            clear_optional_fields: clearFields,
+          });
+        } else {
+          savedProf = await api.createMeasurementProfile({
+            profile_name: name || 'New Profile',
+            gender,
+            target_category: targetCategory,
+            fit_preference: 'regular',
+            unit: 'cm',
+            weight_unit: 'kg',
+            chest_bust: chest,
+            waist,
+            hips,
+            height,
+            weight: 62,
+            shoulder,
+            inseam,
+            is_default: false,
+          });
+        }
+
+        const wasEditing = editingProfileId != null;
+        showProfileModal = false;
+        editingProfileId = null;
+
+        await store.refreshProfiles();
+        if (savedProf) {
+          store.setActiveProfile(savedProf);
+          store.applyProfileToDraft(savedProf);
+        }
+
+        // Re-run recommendations with the updated values (Requirement 8)
+        const currentFitStyle = store.getState().draftMeasurements.fitStyle || 'Regular';
+        await triggerMultiBrandEvaluation(currentFitStyle);
+
+        store.addToast(
+          wasEditing
+            ? 'Measurements updated, history logged, and recommendations refreshed!'
+            : `Profile "${name}" created!`,
+          'success'
+        );
+
+        if (wasEditing) {
+          window.location.hash = '#/results';
+        } else {
+          window.dispatchEvent(new CustomEvent('hashchange'));
+        }
+      } catch (err) {
+        store.addToast(err.message || 'Error saving profile', 'error');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  document.querySelectorAll('.tilt-card').forEach((card) => {
+    tilt3d(card, 4);
+  });
 }
