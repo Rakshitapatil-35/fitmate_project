@@ -22,3 +22,16 @@ class UserRegisterRequest(BaseModel):
         if not (has_letter and has_digit):
             raise ValueError("Password must contain at least one letter and one number.")
         return value
+
+
+class UserLoginRequest(BaseModel):
+    """Request payload for user login."""
+
+    email: EmailStr
+    password: str = Field(..., min_length=1, max_length=128)
+
+
+class TokenRefreshRequest(BaseModel):
+    """Request payload for refreshing an access token using a refresh token."""
+
+    refresh_token: str = Field(..., min_length=10)
