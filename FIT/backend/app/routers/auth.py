@@ -89,3 +89,50 @@ async def login_user(
         user_id=user.id,
         role=user.role,
     )
+
+
+@router.post(
+    "/refresh",
+    response_model=TokenResponse,
+    dependencies=[Depends(rate_limit_auth)],
+)
+async def refresh_access_token(
+    payload: TokenRefreshRequest,
+    db: Session = Depends(get_db),
+) -> TokenResponse:
+    """Exchange a valid non-revoked refresh token for a fresh JWT token pair."""
+    decoded = decode_token(payload.refresh_token, expected_type="refresh")
+    jti = decoded["jti"]
+    user_id = int(str(decoded["sub"]))
+
+    revoked = db.scalar(select(TokenBlacklist).where(TokenBlacklist.jti == jti))
+    if revoked is not None:
+        raise UnauthorizedException("Refresh token has been revoked.")
+
+    user = db.get(User, user_id)
+    if user is None or not user.is_active:
+        raise UnauthorizedException("User account is invalid or inactive.")
+
+    # Rotate refresh token by blacklisting the old one
+    exp_ts = datetime.fromtimestamp(int(decoded["exp"]), tz=timezone.utc)
+    db.add(
+        TokenBlacklist(
+            jti=jti,
+            token_type="refresh",
+            user_id=user.id,
+            expires_at=exp_ts,
+        )
+    )
+    db.commit()
+
+    access_data = create_access_token(subject=user.id, role=user.role)
+    refresh_data = create_refresh_token(subject=user.id, role=user.role)
+
+    return TokenResponse(
+        access_token=access_data["token"],
+        refresh_token=refresh_data["token"],
+        token_type="bearer",
+        expires_at=access_data["expires_at"],
+        user_id=user.id,
+        role=user.role,
+    )
