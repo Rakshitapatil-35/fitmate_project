@@ -37,3 +37,37 @@ class User(Base):
         onupdate=utc_now,
         nullable=False,
     )
+
+    measurement_profiles: Mapped[List["BodyMeasurementProfile"]] = relationship(
+        "BodyMeasurementProfile",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    recommendations: Mapped[List["RecommendationRecord"]] = relationship(
+        "RecommendationRecord",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+    feedbacks: Mapped[List["FitFeedback"]] = relationship(
+        "FitFeedback",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
+
+
+class TokenBlacklist(Base):
+    """Revoked JWT tokens (access or refresh) for logout and session invalidation."""
+
+    __tablename__ = "token_blacklist"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+    jti: Mapped[str] = mapped_column(String(64), unique=True, index=True, nullable=False)
+    token_type: Mapped[str] = mapped_column(String(32), nullable=False)
+    user_id: Mapped[int] = mapped_column(
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        index=True,
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    revoked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=utc_now, nullable=False)
