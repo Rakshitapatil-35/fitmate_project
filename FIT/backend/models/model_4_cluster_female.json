@@ -1,0 +1,101 @@
+{
+  "model_name": "FITMATE Model 4 (Body Pattern Clustering - Female)",
+  "algorithm": "KMeans (benchmarked with GaussianMixture)",
+  "features": [
+    "height_cm",
+    "weight_kg",
+    "waist_cm"
+  ],
+  "optimal_k": 4,
+  "training_date": "2026-11-15T07:48:33.030313+00:00",
+  "library_versions": {
+    "scikit-learn": "1.9.1",
+    "numpy": "2.5.4",
+    "pandas": "3.1.1",
+    "joblib": "1.6.0"
+  },
+  "dataset": {
+    "name": "NHANES 2011-2018 (Anthropometric Body Measures)",
+    "cohort_gender": "female",
+    "training_rows": 8201,
+    "features_used": [
+      "height_cm",
+      "weight_kg",
+      "waist_cm"
+    ]
+  },
+  "metrics": {
+    "silhouette_score": 0.311,
+    "davies_bouldin_index": 0.9701,
+    "stability_ari_across_seeds": 0.9284,
+    "gmm_sanity_check_ari": 0.4505,
+    "gmm_bic": 51894.9,
+    "ood_distance_threshold_99th_pct": 2.5216
+  },
+  "cluster_labels": {
+    "0": "Short - Balanced / Moderate Build",
+    "1": "Short - Plus / Extended Waist",
+    "2": "Medium-Height - Balanced / Moderate Build",
+    "3": "Medium-Height - Plus / Extended Waist"
+  },
+  "cluster_profiles": [
+    {
+      "cluster_id": 0,
+      "count": 2438,
+      "share_pct": 29.73,
+      "height_cm_mean": 153.65,
+      "height_cm_median": 154.3,
+      "weight_kg_mean": 58.25,
+      "weight_kg_median": 58.6,
+      "waist_cm_mean": 86.04,
+      "waist_cm_median": 86.5,
+      "waist_to_height_ratio": 0.561,
+      "label": "Short - Balanced / Moderate Build"
+    },
+    {
+      "cluster_id": 1,
+      "count": 2334,
+      "share_pct": 28.46,
+      "height_cm_mean": 157.4,
+      "height_cm_median": 157.8,
+      "weight_kg_mean": 83.47,
+      "weight_kg_median": 82.7,
+      "waist_cm_mean": 106.66,
+      "waist_cm_median": 106.0,
+      "waist_to_height_ratio": 0.678,
+      "label": "Short - Plus / Extended Waist"
+    },
+    {
+      "cluster_id": 2,
+      "count": 2237,
+      "share_pct": 27.28,
+      "height_cm_mean": 166.28,
+      "height_cm_median": 165.6,
+      "weight_kg_mean": 69.6,
+      "weight_kg_median": 69.1,
+      "waist_cm_mean": 89.32,
+      "waist_cm_median": 90.2,
+      "waist_to_height_ratio": 0.537,
+      "label": "Medium-Height - Balanced / Moderate Build"
+    },
+    {
+      "cluster_id": 3,
+      "count": 1192,
+      "share_pct": 14.53,
+      "height_cm_mean": 165.17,
+      "height_cm_median": 165.1,
+      "weight_kg_mean": 115.26,
+      "weight_kg_median": 110.8,
+      "waist_cm_mean": 124.8,
+      "waist_cm_median": 123.5,
+      "waist_to_height_ratio": 0.757,
+      "label": "Medium-Height - Plus / Extended Waist"
+    }
+  ],
+  "privacy_and_compliance": {
+    "identifiers_included": false,
+    "pii_check": "PASSED (Only anonymized aggregate anthropometry)",
+    "compliance_framework": "India DPDP Act 2023 - Aggregated & Anonymized"
+  },
+  "sizing_caveat": "Clusters are exploratory groupings. Internal validation metrics do not prove clusters are clinically or commercially optimal for production garment size charts."
+}
