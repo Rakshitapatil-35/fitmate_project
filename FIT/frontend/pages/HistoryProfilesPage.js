@@ -133,7 +133,7 @@ export async function renderHistoryProfilesPage() {
           </div>
         </div>
   ` : ''}
-        ${false ? `
+        ${true ? `
         <!-- Saved Profiles Grid with Edit, Reset, Delete, and Change History -->
         <div style="margin-bottom: 2.25rem;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.85rem;">
