@@ -422,4 +422,20 @@ export async function renderHistoryProfilesPage() {
 export function onMountHistoryProfilesPage() {
   attachTopNavEvents();
 
+  // 1. Select & Use Profile
+  document.querySelectorAll('.btn-select-profile').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.dataset.id);
+      const { profiles } = store.getState();
+      const prof = profiles.find((p) => p.id === id);
+      if (prof) {
+        store.setActiveProfile(prof);
+        store.applyProfileToDraft(prof);
+        store.addToast(`Loaded "${prof.profile_name}" — recalculating brand recommendations...`, 'info');
+        await triggerMultiBrandEvaluation(prof.fit_style || store.getState().draftMeasurements.fitStyle || 'Regular');
+        window.location.hash = '#/results';
+      }
+    });
+  });
+    
 }
