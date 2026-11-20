@@ -335,7 +335,7 @@ export async function renderHistoryProfilesPage() {
           }
         </div>
   ` : ''}
-        ${false ? `
+        ${true ? `
         <!-- Edit / Create Profile Modal Dialog (Requirement 8) -->
         <div id="new-profile-modal" style="display: ${showProfileModal ? 'flex' : 'none'}; position: fixed; inset: 0; background: rgba(20, 49, 58, 0.45); backdrop-filter: blur(6px); z-index: 1000; align-items: center; justify-content: center; padding: 1rem;">
           <div class="fm-card" style="width: 100%; max-width: 520px; padding: 1.75rem; max-height: 92vh; overflow-y: auto;">
