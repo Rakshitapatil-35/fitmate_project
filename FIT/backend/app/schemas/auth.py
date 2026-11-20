@@ -35,3 +35,20 @@ class TokenRefreshRequest(BaseModel):
     """Request payload for refreshing an access token using a refresh token."""
 
     refresh_token: str = Field(..., min_length=10)
+
+
+class LogoutRequest(BaseModel):
+    """Optional refresh token to revoke alongside the current access token."""
+
+    refresh_token: Optional[str] = None
+
+
+class TokenResponse(BaseModel):
+    """JWT token pair returned upon login or refresh."""
+
+    access_token: str
+    refresh_token: str
+    token_type: str = "bearer"
+    expires_at: datetime
+    user_id: int
+    role: str
