@@ -45,3 +45,14 @@ async def update_my_profile(
     db.commit()
     db.refresh(current_user)
     return current_user
+
+
+@router.delete("/me", response_model=MessageResponse)
+async def delete_my_profile(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> MessageResponse:
+    """Delete the authenticated user's profile and associated measurement profiles."""
+    db.delete(current_user)
+    db.commit()
+    return MessageResponse(success=True, message="User profile deleted successfully.")
