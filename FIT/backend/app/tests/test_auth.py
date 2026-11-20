@@ -55,3 +55,15 @@ def test_register_login_profile_and_logout_flow(client: TestClient) -> None:
     # Subsequent calls with the blacklisted access token must return 401
     after_logout = client.get("/api/v1/users/me", headers=headers)
     assert after_logout.status_code == 401
+
+
+def test_auth_rate_limiting(client: TestClient) -> None:
+    """Verify repeated requests to /api/v1/auth/login trigger 429 Too Many Requests."""
+    status_codes = []
+    for _ in range(12):
+        resp = client.post(
+            "/api/v1/auth/login",
+            json={"email": "alex@sizerec.example.com", "password": "WrongPassword1"},
+        )
+        status_codes.append(resp.status_code)
+    assert 429 in status_codes
