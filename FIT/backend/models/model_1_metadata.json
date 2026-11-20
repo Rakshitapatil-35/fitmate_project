@@ -1,0 +1,100 @@
+{
+  "model_name": "Model 1: Clothing Size Prediction",
+  "algorithm": "XGBoost",
+  "target": "size_label",
+  "ordinal_classes": [
+    "XS",
+    "S",
+    "M",
+    "L",
+    "XL",
+    "XXL",
+    "XXXL"
+  ],
+  "label_mapping": {
+    "XS": 0,
+    "S": 1,
+    "M": 2,
+    "L": 3,
+    "XL": 4,
+    "XXL": 5,
+    "XXXL": 6
+  },
+  "features": {
+    "numeric": [
+      "height_cm",
+      "weight_kg",
+      "age",
+      "bust_cm",
+      "waist_cm",
+      "hip_cm",
+      "height_cm_was_missing",
+      "weight_kg_was_missing",
+      "age_was_missing",
+      "bust_cm_was_missing",
+      "waist_cm_was_missing",
+      "hip_cm_was_missing"
+    ],
+    "categorical": [
+      "category",
+      "fit_preference"
+    ],
+    "all": [
+      "height_cm",
+      "weight_kg",
+      "age",
+      "bust_cm",
+      "waist_cm",
+      "hip_cm",
+      "height_cm_was_missing",
+      "weight_kg_was_missing",
+      "age_was_missing",
+      "bust_cm_was_missing",
+      "waist_cm_was_missing",
+      "hip_cm_was_missing",
+      "category",
+      "fit_preference"
+    ]
+  },
+  "training_dataset": {
+    "name": "data/processed/model_1_size_data.parquet",
+    "sources": [
+      "Rent the Runway",
+      "ModCloth"
+    ],
+    "total_rows": 273676,
+    "train_rows": 218940,
+    "test_rows": 54736
+  },
+  "metrics": {
+    "baseline_majority_accuracy": 0.2351,
+    "baseline_within_one_accuracy": 0.6203,
+    "baseline_macro_f1": 0.0544,
+    "test_accuracy": 0.4435,
+    "test_within_one_accuracy": 0.8397,
+    "test_macro_f1": 0.4212,
+    "cv_comparison": {
+      "DecisionTree": {
+        "cv_accuracy": 0.41580000614459633,
+        "cv_within_one": 0.8151999397705056,
+        "cv_macro_f1": 0.3957019548846337
+      },
+      "RandomForest": {
+        "cv_accuracy": 0.43042493116475206,
+        "cv_within_one": 0.8181749428991462,
+        "cv_macro_f1": 0.3776290976098913
+      },
+      "XGBoost": {
+        "cv_accuracy": 0.4357499311714081,
+        "cv_within_one": 0.8286999472871927,
+        "cv_macro_f1": 0.4102701195488823
+      }
+    }
+  },
+  "training_date": "2026-11-15T10:55:25.937894",
+  "library_versions": {
+    "sklearn": "1.9.1",
+    "xgboost": "3.4.1",
+    "joblib": "1.6.0"
+  }
+}
