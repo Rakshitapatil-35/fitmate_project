@@ -4,12 +4,15 @@ on:
   push:
     branches:
       - main
+      - rakshita
       - "integration/**"
       - "feature/**"
   pull_request:
     branches:
       - main
+      - rakshita
       - "integration/**"
+  workflow_dispatch:
 
 permissions:
   contents: read
