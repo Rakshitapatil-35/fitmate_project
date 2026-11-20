@@ -56,11 +56,98 @@ export function renderAuthPage(params = {}) {
             </div>
           </div>
 
+          <!-- Right Column: Authentication Form -->
           <div style="padding: clamp(1.75rem, 3.5vw, 2.75rem); background: var(--color-white); display: flex; flex-direction: column; justify-content: center;">
             <div style="margin-bottom: 1.5rem;">
               <h1 class="fm-serif" style="font-size: 2rem; font-weight: 700; color: var(--color-dark-chocolate); margin-bottom: 0.25rem;">
                 ${isSignup ? 'Create Your FITMATE Account' : 'Welcome Back to FITMATE'}
               </h1>
+              <p style="font-size: 0.88rem; color: var(--color-text-muted);">
+                ${isSignup ? 'Register below to enter the app immediately — no second login required.' : 'Sign in to access your saved measurement profiles and fit history.'}
+              </p>
+            </div>
+
+            <!-- Segmented Toggle (Log In / Sign Up) -->
+            <div style="display: flex; background: var(--color-soft-cream); padding: 0.28rem; border-radius: var(--radius-sm); border: 1px solid var(--color-muted-beige); margin-bottom: 1.35rem;">
+              <button type="button" id="tab-login" class="fm-btn ${!isSignup ? 'fm-btn-primary' : 'fm-btn-ghost'}" style="flex: 1; padding: 0.55rem; font-size: 0.88rem;">
+                Log In
+              </button>
+              <button type="button" id="tab-signup" class="fm-btn ${isSignup ? 'fm-btn-primary' : 'fm-btn-ghost'}" style="flex: 1; padding: 0.55rem; font-size: 0.88rem;">
+                Sign Up
+              </button>
+            </div>
+
+            <!-- Demo Account Auto-Fill Bar -->
+            <div style="background: var(--color-soft-cream); border: 1px solid var(--color-muted-beige); border-radius: var(--radius-sm); padding: 0.7rem 0.9rem; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+              <div style="font-size: 0.78rem; color: var(--color-text-muted);">
+                <strong style="color: var(--color-espresso);">Demo Account:</strong> alex@sizerec.example.com
+              </div>
+              <button type="button" id="btn-fill-demo" class="fm-btn fm-btn-secondary fm-btn-sm" style="padding: 0.28rem 0.75rem; font-size: 0.76rem; flex-shrink: 0;">
+                Auto-Fill Demo
+              </button>
+            </div>
+
+            <!-- Server Error Banner -->
+            <div id="auth-general-error" role="alert" style="display: none; background: var(--color-error-light); border: 1px solid var(--color-error); color: var(--color-error); padding: 0.75rem 1rem; border-radius: var(--radius-sm); font-size: 0.84rem; font-weight: 600; margin-bottom: 1rem;"></div>
+
+            <form id="auth-form" novalidate>
+              ${
+                isSignup
+                  ? `
+                <div class="fm-form-group">
+                  <label class="fm-label" for="auth-name">Full Name <span style="color: var(--color-champagne-gold);">*</span></label>
+                  <div class="fm-input-wrapper">
+                    <span class="material-symbols-outlined fm-input-icon">person</span>
+                    <input type="text" id="auth-name" class="fm-input with-icon" placeholder="Emma Watson" autocomplete="name" required />
+                  </div>
+                  <div id="err-name" class="fm-error-text" style="display: none; color: var(--color-error); font-size: 0.78rem; margin-top: 0.25rem; font-weight: 600;"></div>
+                </div>
+              `
+                  : ''
+              }
+
+              <div class="fm-form-group">
+                <label class="fm-label" for="auth-email">Email Address <span style="color: var(--color-champagne-gold);">*</span></label>
+                <div class="fm-input-wrapper">
+                  <span class="material-symbols-outlined fm-input-icon">mail</span>
+                  <input type="email" id="auth-email" class="fm-input with-icon" placeholder="alex@sizerec.example.com" autocomplete="email" required />
+                </div>
+                <div id="err-email" class="fm-error-text" style="display: none; color: var(--color-error); font-size: 0.78rem; margin-top: 0.25rem; font-weight: 600;"></div>
+              </div>
+
+              <div class="fm-form-group">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <label class="fm-label" for="auth-password">Password <span style="color: var(--color-champagne-gold);">*</span></label>
+                  <span style="font-size: 0.72rem; color: var(--color-text-light);">
+                    ${isSignup ? 'Min 8 chars, 1 letter & 1 number' : ''}
+                  </span>
+                </div>
+                <div class="fm-input-wrapper">
+                  <span class="material-symbols-outlined fm-input-icon">lock</span>
+                  <input type="password" id="auth-password" class="fm-input with-icon" placeholder="••••••••" autocomplete="${isSignup ? 'new-password' : 'current-password'}" style="padding-right: 2.8rem;" required />
+                  <button
+                    type="button"
+                    id="btn-toggle-password"
+                    aria-label="Toggle password visibility"
+                    style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--color-text-light); display: flex; align-items: center; padding: 0.25rem;"
+                  >
+                    <span class="material-symbols-outlined" id="icon-toggle-password" style="font-size: 19px;">visibility</span>
+                  </button>
+                </div>
+                <div id="err-password" class="fm-error-text" style="display: none; color: var(--color-error); font-size: 0.78rem; margin-top: 0.25rem; font-weight: 600;"></div>
+              </div>
+
+              <button type="submit" id="btn-auth-submit" class="fm-btn fm-btn-primary fm-btn-block" style="margin-top: 1rem; height: 3.2rem; font-size: 0.95rem;">
+                <span>${isSignup ? 'Create Account & Continue' : 'Sign In & Continue'}</span>
+                <span class="material-symbols-outlined" style="font-size: 19px; color: var(--color-champagne-gold);">arrow_forward</span>
+              </button>
+            </form>
+
+            <!-- Guest Access -->
+            <div style="text-align: center; margin-top: 1.35rem; border-top: 1px solid var(--color-border-subtle); padding-top: 1rem;">
+              <a href="#/gender" style="font-size: 0.85rem; color: var(--color-espresso); font-weight: 700; text-decoration: none;">
+                Continue as Guest (Save measurements later) →
+              </a>
             </div>
           </div>
 
@@ -70,4 +157,60 @@ export function renderAuthPage(params = {}) {
       ${renderBottomTabBar('/auth')}
     </div>
   `;
+}
+
+function showFieldError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (msg) {
+    el.textContent = msg;
+    el.style.display = 'block';
+  } else {
+    el.textContent = '';
+    el.style.display = 'none';
+  }
+}
+
+function validateAuthInputs(isSignup, email, name, password) {
+  let valid = true;
+  showFieldError('err-name', '');
+  showFieldError('err-email', '');
+  showFieldError('err-password', '');
+  const generalErr = document.getElementById('auth-general-error');
+  if (generalErr) generalErr.style.display = 'none';
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!email) {
+    showFieldError('err-email', 'Please enter your email address.');
+    valid = false;
+  } else if (!emailRegex.test(email)) {
+    showFieldError('err-email', 'Please enter a valid email address (e.g. name@example.com).');
+    valid = false;
+  }
+
+  if (isSignup) {
+    if (!name || name.length < 2) {
+      showFieldError('err-name', 'Please enter your full name (at least 2 characters).');
+      valid = false;
+    }
+  }
+
+  if (!password) {
+    showFieldError('err-password', 'Please enter your password.');
+    valid = false;
+  } else if (isSignup) {
+    if (password.length < 8) {
+      showFieldError('err-password', 'Password must be at least 8 characters long.');
+      valid = false;
+    } else if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+      showFieldError('err-password', 'Password must contain at least one letter and one number.');
+      valid = false;
+    }
+  }
+
+  return valid;
+}
+
+export function onMountAuthPage(params = {}) {
+  attachTopNavEvents();
 }
