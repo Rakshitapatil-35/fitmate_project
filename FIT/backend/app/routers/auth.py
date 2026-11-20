@@ -59,3 +59,33 @@ async def register_user(
     db.commit()
     db.refresh(user)
     return user
+
+
+@router.post(
+    "/login",
+    response_model=TokenResponse,
+    dependencies=[Depends(rate_limit_auth)],
+)
+async def login_user(
+    payload: UserLoginRequest,
+    db: Session = Depends(get_db),
+) -> TokenResponse:
+    """Authenticate user credentials and return signed JWT access and refresh tokens."""
+    normalized_email = payload.email.lower().strip()
+    user = db.scalar(select(User).where(User.email == normalized_email))
+    if user is None or not verify_password(payload.password, user.hashed_password):
+        raise UnauthorizedException("Incorrect email or password.")
+    if not user.is_active:
+        raise UnauthorizedException("User account is inactive.")
+
+    access_data = create_access_token(subject=user.id, role=user.role)
+    refresh_data = create_refresh_token(subject=user.id, role=user.role)
+
+    return TokenResponse(
+        access_token=access_data["token"],
+        refresh_token=refresh_data["token"],
+        token_type="bearer",
+        expires_at=access_data["expires_at"],
+        user_id=user.id,
+        role=user.role,
+    )
