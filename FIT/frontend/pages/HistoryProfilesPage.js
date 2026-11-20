@@ -110,7 +110,7 @@ export async function renderHistoryProfilesPage() {
           </div>
         </div>
   ` : ''}
-        ${false ? `
+        ${true ? `
         <!-- Vault Stats Card -->
         <div class="fm-card tilt-card" style="margin-bottom: 1.75rem; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
           <div style="display: flex; align-items: center; gap: 1rem;">
